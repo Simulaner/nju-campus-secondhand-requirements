@@ -1,0 +1,97 @@
+{
+  "method" : "PDFKit text extraction and rasterization of every actual PDF page",
+  "pageCount" : 13,
+  "pages" : [
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 1,
+      "replacementCharacters" : 0,
+      "textCharacters" : 1604,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 2,
+      "replacementCharacters" : 0,
+      "textCharacters" : 1900,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 3,
+      "replacementCharacters" : 0,
+      "textCharacters" : 718,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 4,
+      "replacementCharacters" : 0,
+      "textCharacters" : 619,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 5,
+      "replacementCharacters" : 0,
+      "textCharacters" : 460,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 6,
+      "replacementCharacters" : 0,
+      "textCharacters" : 583,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 7,
+      "replacementCharacters" : 0,
+      "textCharacters" : 676,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 8,
+      "replacementCharacters" : 0,
+      "textCharacters" : 259,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 9,
+      "replacementCharacters" : 0,
+      "textCharacters" : 226,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 10,
+      "replacementCharacters" : 0,
+      "textCharacters" : 241,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 11,
+      "replacementCharacters" : 0,
+      "textCharacters" : 197,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 12,
+      "replacementCharacters" : 0,
+      "textCharacters" : 269,
+      "widthPoints" : 595.27999999999997
+    },
+    {
+      "heightPoints" : 841.88999999999999,
+      "page" : 13,
+      "replacementCharacters" : 0,
+      "textCharacters" : 935,
+      "widthPoints" : 595.27999999999997
+    }
+  ]
+}

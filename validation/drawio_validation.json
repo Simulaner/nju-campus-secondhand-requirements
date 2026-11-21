@@ -1,0 +1,20 @@
+[
+  {
+    "name": "UI01_商品大厅",
+    "cells": 135,
+    "width": 1440,
+    "height": 1161
+  },
+  {
+    "name": "UI04_交易详情",
+    "cells": 101,
+    "width": 1440,
+    "height": 1124
+  },
+  {
+    "name": "UI11_商品审核",
+    "cells": 89,
+    "width": 1440,
+    "height": 1050
+  }
+]

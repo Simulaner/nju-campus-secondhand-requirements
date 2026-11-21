@@ -1,0 +1,125 @@
+{
+  "pages": [
+    {
+      "name": "UI01_商品大厅",
+      "route": "market",
+      "role": "buyer",
+      "width": 1440,
+      "height": 1161,
+      "brokenImages": []
+    },
+    {
+      "name": "UI02_商品详情",
+      "route": "product-camera",
+      "role": "buyer",
+      "width": 1440,
+      "height": 1050,
+      "brokenImages": []
+    },
+    {
+      "name": "UI03_交易中心",
+      "route": "transactions",
+      "role": "buyer",
+      "width": 1440,
+      "height": 1050,
+      "brokenImages": []
+    },
+    {
+      "name": "UI04_交易详情",
+      "route": "transaction",
+      "role": "buyer",
+      "width": 1440,
+      "height": 1124,
+      "brokenImages": []
+    },
+    {
+      "name": "UI05_发布闲置",
+      "route": "publish",
+      "role": "seller",
+      "width": 1440,
+      "height": 1439,
+      "brokenImages": []
+    },
+    {
+      "name": "UI06_我的发布",
+      "route": "my-products",
+      "role": "seller",
+      "width": 1440,
+      "height": 1171,
+      "brokenImages": []
+    },
+    {
+      "name": "UI07_消息中心",
+      "route": "notifications",
+      "role": "buyer",
+      "width": 1440,
+      "height": 1050,
+      "brokenImages": []
+    },
+    {
+      "name": "UI08_注册验证",
+      "route": "register",
+      "role": "buyer",
+      "width": 1440,
+      "height": 1083,
+      "brokenImages": []
+    },
+    {
+      "name": "UI09_登录",
+      "route": "login",
+      "role": "buyer",
+      "width": 1440,
+      "height": 1050,
+      "brokenImages": []
+    },
+    {
+      "name": "UI10_管理概览",
+      "route": "admin-overview",
+      "role": "admin",
+      "width": 1440,
+      "height": 1140,
+      "brokenImages": []
+    },
+    {
+      "name": "UI11_商品审核",
+      "route": "admin-review",
+      "role": "admin",
+      "width": 1440,
+      "height": 1050,
+      "brokenImages": []
+    },
+    {
+      "name": "UI12_商品管理",
+      "route": "admin-products",
+      "role": "admin",
+      "width": 1440,
+      "height": 1050,
+      "brokenImages": []
+    },
+    {
+      "name": "UI13_用户管理",
+      "route": "admin-users",
+      "role": "admin",
+      "width": 1440,
+      "height": 1050,
+      "brokenImages": []
+    },
+    {
+      "name": "UI14_操作日志",
+      "route": "admin-audit",
+      "role": "admin",
+      "width": 1440,
+      "height": 1050,
+      "brokenImages": []
+    },
+    {
+      "name": "UI15_视觉规范",
+      "route": "guide",
+      "role": "buyer",
+      "width": 1440,
+      "height": 1185,
+      "brokenImages": []
+    }
+  ],
+  "errors": []
+}

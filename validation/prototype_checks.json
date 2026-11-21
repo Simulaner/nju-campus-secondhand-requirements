@@ -1,0 +1,124 @@
+{
+  "scope": "仅验证实验2浏览器交互原型，不代表真实服务端权限、邮件、数据库事务或并发性能通过",
+  "results": [
+    {
+      "name": "组合查询与空状态",
+      "result": "PASS"
+    },
+    {
+      "name": "价格边界拒绝",
+      "result": "PASS"
+    },
+    {
+      "name": "注册域名错误与演示验证码",
+      "result": "PASS"
+    },
+    {
+      "name": "发布表单错误不会创建待审核记录",
+      "result": "PASS"
+    },
+    {
+      "name": "预约、卖家接受、双确认完整流程",
+      "result": "PASS"
+    },
+    {
+      "name": "联系信息须授权，终止时清除",
+      "result": "PASS"
+    },
+    {
+      "name": "预约下架联动及重审入口",
+      "result": "PASS"
+    },
+    {
+      "name": "超时边界与任务重复执行",
+      "result": "PASS"
+    },
+    {
+      "name": "审核驳回原因与审核通过",
+      "result": "PASS"
+    },
+    {
+      "name": "违规下架与解除限制不自动发布",
+      "result": "PASS"
+    },
+    {
+      "name": "停用账号、关联清理与恢复",
+      "result": "PASS"
+    },
+    {
+      "name": "消息目标与已读状态",
+      "result": "PASS"
+    },
+    {
+      "name": "联系授权弹窗截图",
+      "result": "PASS"
+    },
+    {
+      "name": "1280px与390px布局不横向溢出",
+      "result": "PASS"
+    }
+  ],
+  "layouts": [
+    {
+      "width": 1280,
+      "route": "market",
+      "viewport": 1280,
+      "content": 1280
+    },
+    {
+      "width": 1280,
+      "route": "product-camera",
+      "viewport": 1280,
+      "content": 1280
+    },
+    {
+      "width": 1280,
+      "route": "transaction",
+      "viewport": 1280,
+      "content": 1280
+    },
+    {
+      "width": 1280,
+      "route": "publish",
+      "viewport": 1280,
+      "content": 1280
+    },
+    {
+      "width": 1280,
+      "route": "admin-review",
+      "viewport": 1280,
+      "content": 1280
+    },
+    {
+      "width": 390,
+      "route": "market",
+      "viewport": 390,
+      "content": 390
+    },
+    {
+      "width": 390,
+      "route": "product-camera",
+      "viewport": 390,
+      "content": 390
+    },
+    {
+      "width": 390,
+      "route": "transaction",
+      "viewport": 390,
+      "content": 390
+    },
+    {
+      "width": 390,
+      "route": "publish",
+      "viewport": 390,
+      "content": 390
+    },
+    {
+      "width": 390,
+      "route": "admin-review",
+      "viewport": 390,
+      "content": 390
+    }
+  ],
+  "pageErrors": []
+}

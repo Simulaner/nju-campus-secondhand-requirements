@@ -1,0 +1,47 @@
+[
+  {
+    "source": "U01_UML类图.puml",
+    "png_bytes": 182566,
+    "svg_bytes": 43478
+  },
+  {
+    "source": "U02_UML组件图.puml",
+    "png_bytes": 122781,
+    "svg_bytes": 29769
+  },
+  {
+    "source": "U03_UML用例图.puml",
+    "png_bytes": 68341,
+    "svg_bytes": 22762
+  },
+  {
+    "source": "U04_UML活动图_交易流程.puml",
+    "png_bytes": 75957,
+    "svg_bytes": 29147
+  },
+  {
+    "source": "U05_UML状态图_商品.puml",
+    "png_bytes": 51581,
+    "svg_bytes": 16359
+  },
+  {
+    "source": "U06_UML状态图_预约.puml",
+    "png_bytes": 86133,
+    "svg_bytes": 14357
+  },
+  {
+    "source": "U07_UML序列图_并发预约.puml",
+    "png_bytes": 55538,
+    "svg_bytes": 20848
+  },
+  {
+    "source": "U08_UML序列图_双方确认.puml",
+    "png_bytes": 56045,
+    "svg_bytes": 20364
+  },
+  {
+    "source": "U09_UML序列图_下架与超时.puml",
+    "png_bytes": 54762,
+    "svg_bytes": 19478
+  }
+]
