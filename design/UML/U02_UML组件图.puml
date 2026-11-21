@@ -1,0 +1,70 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 分层组件与协作
+top to bottom direction
+actor "买家 / 卖家" as User
+actor 管理员 as Admin
+component "桌面浏览器\n页面 / 表单 / 状态反馈" as UI
+component "身份与归属校验\n会话 / 角色 / 对象权限" as Auth
+package "Django应用 · 业务服务层" {
+  component "商品服务\nProductService" as Product
+  component "预约交易服务\nReservationService" as Reserve
+  component "审核与违规服务\nModerationService" as Moderate
+  component "账号管理服务\nAccountService" as Account
+  component "查询统计服务\nQueryService" as Query
+  component "通知与审计\nNotification / Audit" as Events
+}
+component "定时扫描 / 重启补偿\nExpiryCommand" as Expiry
+component "邮件发送适配器\n真实SMTP / 测试后端" as Mail
+database "SQLite\n外键 / 唯一约束 / 事务" as DB
+folder "商品图片存储" as Media
+User --> UI
+Admin --> UI
+UI --> Auth
+Auth --> Product
+Auth --> Reserve
+Auth --> Moderate
+Auth --> Account
+Auth --> Query
+Auth --> Mail : 邮箱验证
+Product --> Reserve : 下架关联预约
+Moderate --> Reserve : 违规取消
+Account --> Reserve : 停用前影响预览与处理
+Expiry --> Reserve : 统一到期规则
+Product --> DB
+Product --> Media
+Reserve --> DB
+Moderate --> DB
+Account --> DB
+Query --> DB
+Product --> Events
+Reserve --> Events
+Moderate --> Events
+Account --> Events
+Events --> DB
+note bottom of DB
+  跨实体业务操作在同一短事务提交
+  SQLite不依赖SELECT FOR UPDATE
+  失败审计在业务回滚后另行保存
+end note
+
+@enduml

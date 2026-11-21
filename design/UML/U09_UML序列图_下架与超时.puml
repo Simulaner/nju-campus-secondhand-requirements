@@ -1,0 +1,52 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 下架和到期处理的竞争
+actor "卖家 / 管理员" as User
+control "ProductService" as Product
+control "ExpiryCommand" as Clock
+control "ReservationService" as Service
+database 数据库 as DB
+alt 下架先成功
+  User -> Product : 下架商品（管理员须记录原因）
+  Product -> Service : unpublish(productId, actor, reason)
+  Service -> DB : BEGIN；权限及实时状态校验
+  Service -> DB : 商品→已下架；有效预约→已取消
+  Service -> DB : 清理联系信息；创建通知与成功日志
+  Service -> DB : COMMIT
+  Clock -> Service : expire(reservationId, now)
+  Service -> DB : 校验预约已非待确认 → 不再更新
+else 到期先成功
+  Clock -> Service : expire(reservationId, now)
+  Service -> DB : BEGIN；校验待确认且now>=expiresAt
+  Service -> DB : 预约→已超时；对应商品占用→已发布
+  Service -> DB : 通知 / 日志；COMMIT
+  User -> Product : 随后下架
+  Product -> Service : unpublish(productId, actor, reason)
+  Service -> DB : BEGIN；商品已发布→已下架；日志；COMMIT
+end
+note over Service, DB
+  不依据过期页面或旧任务快照直接恢复商品
+  写入失败整体回滚；失败审计在回滚后另行保存
+  调度器重启后补扫；重复任务不重复通知
+end note
+
+@enduml

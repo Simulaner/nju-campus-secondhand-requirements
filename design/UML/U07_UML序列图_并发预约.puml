@@ -1,0 +1,55 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 竞争预约与重复请求
+actor "买家A / B" as Buyer
+boundary 页面 as UI
+control "ReservationService" as Service
+database 数据库 as DB
+control 审计 as Audit
+Buyer -> UI : 点击预约
+UI -> Service : reserve(productId, requestKey, version)
+Service -> Service : 身份、非本人商品、请求标识校验
+Service -> DB : 查找相同用户与requestKey的已提交结果
+alt 已成功处理过
+  DB --> Service : 原预约结果
+  Service --> UI : 返回原结果，不重复写入
+else 新请求
+  group 短事务（IMMEDIATE / 条件更新 / 唯一约束）
+    Service -> DB : BEGIN；校验实时状态与版本
+    Service -> DB : 条件更新商品：已发布→已预约
+    alt 影响1行且有效预约唯一约束通过
+      Service -> DB : INSERT预约、请求结果、通知及成功日志
+      Service -> DB : COMMIT
+      Service --> UI : 成功，进入预约详情
+    else 状态冲突或写入失败
+      Service -> DB : ROLLBACK
+      Service -> Audit : 另行保存失败结果
+      Service --> UI : 冲突 / 可重试故障与最新状态
+    end
+  end
+end
+note over UI, Service
+  HTTP超时不等于业务失败；按requestKey核对结果
+  A/B竞争同一商品只能一笔事务取得有效预约
+end note
+
+@enduml

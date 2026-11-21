@@ -1,0 +1,55 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 双方确认与唯一交易
+actor "买家 / 卖家" as User
+boundary 交易详情 as UI
+control "ReservationService" as Service
+database 数据库 as DB
+User -> UI : 确认收货 / 确认交易完成
+UI -> Service : confirm(reservationId, actor)
+Service -> DB : BEGIN；读取实时预约与商品
+Service -> Service : 校验当事人、已接受、未取消/下架
+alt 预约已完成且是合法重复请求
+  Service -> DB : 读取原交易结果；结束事务
+  Service --> UI : 已完成，无重复交易
+else 已失效或无权限
+  Service -> DB : ROLLBACK
+  Service -> DB : 独立记录失败审计
+  Service --> UI : 拒绝并刷新状态
+else 合法有效预约
+  Service -> DB : 只更新当前角色确认时间（已确认则保持原值）
+  alt 另一方尚未确认
+    Service -> DB : COMMIT
+    Service --> UI : 已确认，等待另一方
+  else 双方确认齐全
+    Service -> DB : 预约→已完成；商品→已售出
+    Service -> DB : INSERT唯一TradeRecord；日志；清理联系信息
+    Service -> DB : COMMIT（任一步失败则整体ROLLBACK）
+    Service --> UI : 交易完成
+  end
+end
+note over Service, DB
+  并发确认与取消使用同一事务协调规则
+  数据库约束保证reservationId仅对应一个交易结果
+end note
+
+@enduml

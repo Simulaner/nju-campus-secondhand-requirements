@@ -1,0 +1,120 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 核心领域类图
+left to right direction
+class "用户\nUser" as User {
+  +id: UUID
+  +email: string {unique}
+  -passwordHash: string
+  +displayName: string
+  +isAdmin: boolean
+  +isActive: boolean
+}
+class "商品\nProduct" as Product {
+  +id: UUID
+  +title: string
+  +priceFen: integer?
+  +condition: integer? {1..9}
+  +description: text
+  +meetingPlace: string?
+  +status: ProductStatus
+  +version: integer
+  +relistBlocked: boolean
+  +validateForReview()
+  +canReserve(actor): boolean
+}
+class "分类\nCategory" as Category {
+  +id: UUID
+  +name: string
+}
+class "商品图片\nProductImage" as Image {
+  +id: UUID
+  +storageKey: string
+  +position: integer
+}
+class "预约\nReservation" as Reservation {
+  +id: UUID
+  +status: ReservationStatus
+  +expiresAt: datetime
+  +buyerConfirmedAt: datetime?
+  +sellerConfirmedAt: datetime?
+  +productSnapshot: JSON
+  +cancelReason: string?
+  +isActive(): boolean
+}
+class "交易结果\nTradeRecord" as Trade {
+  +id: UUID
+  +completedAt: datetime
+  +agreedPriceFen: integer
+}
+class "审核记录\nReviewRecord" as Review {
+  +id: UUID
+  +productVersion: integer
+  +decision: string
+  +reason: string?
+  +createdAt: datetime
+}
+class "交接联系信息\nHandoverContact" as Contact {
+  +kind: string
+  +value: string
+  +consentAt: datetime
+  +eraseAtTermination()
+}
+class "站内通知\nNotification" as Notice {
+  +id: UUID
+  +eventKey: string
+  +message: string
+  +readAt: datetime?
+}
+class "操作日志\nAuditLog" as Audit {
+  +id: UUID
+  +actorId: UUID?
+  +objectType: string
+  +objectId: UUID
+  +action: string
+  +result: string
+  +createdAt: datetime
+}
+User "1" -- "0..*" Product : 卖家
+Category "0..1" -- "0..*" Product : 草稿可未分类
+Product "1" *-- "0..9" Image
+Product "1" -- "0..*" Reservation : 历史预约
+User "1" -- "0..*" Reservation : 买家
+Reservation "1" -- "0..1" Trade
+Reservation "1" *-- "0..2" Contact
+User "1" -- "0..*" Contact : 信息提供者
+Product "1" -- "0..*" Review
+User "1" -- "0..*" Review : 审核员
+User "1" -- "0..*" Notice : 接收者
+User "0..1" -- "0..*" Audit : 操作者 / 系统
+note bottom of Reservation
+  同一商品最多1条有效预约（待确认或已确认）
+  buyer != product.seller
+  只有双方确认后才生成唯一交易结果
+end note
+note bottom of Product
+  草稿可不完整；提交审核时验证必填项
+  发布至少1张图片、金额>0、新旧程度1..9
+  历史预约不能随下架物理删除
+end note
+
+@enduml

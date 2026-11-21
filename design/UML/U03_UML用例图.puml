@@ -1,0 +1,70 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 角色与功能边界
+left to right direction
+actor 买家 as Buyer
+actor 卖家 as Seller
+actor 管理员 as Admin
+actor "到期调度器" as Clock
+rectangle "南京大学校园二手交易平台" {
+  usecase "邮箱验证注册与登录" as Login
+  usecase "组合搜索 / 排序 / 查看商品" as Search
+  usecase "预约商品" as Reserve
+  usecase "取消本人预约" as Cancel
+  usecase "确认收货" as Receive
+  usecase "查看交易历史与通知" as History
+  usecase "保存草稿 / 编辑 / 提交审核" as Edit
+  usecase "下架 / 重新提交审核" as Offline
+  usecase "接受 / 拒绝预约" as Accept
+  usecase "确认交易完成" as Finish
+  usecase "查看授权面交联系方式" as Contact
+  usecase "审核商品与记录原因" as Review
+  usecase "违规下架 / 管理重审限制" as Moderate
+  usecase "停用 / 恢复账号" as Account
+  usecase "查看统计与审计日志" as Statistics
+  usecase "关闭到期待确认预约" as Timeout
+}
+Buyer --> Login
+Buyer --> Search
+Buyer --> Reserve
+Buyer --> Cancel
+Buyer --> Receive
+Buyer --> History
+Buyer --> Contact
+Seller --> Login
+Seller --> Edit
+Seller --> Offline
+Seller --> Accept
+Seller --> Finish
+Seller --> History
+Seller --> Contact
+Admin --> Review
+Admin --> Moderate
+Admin --> Account
+Admin --> Statistics
+Clock --> Timeout
+note bottom of Seller
+  同一普通账号可同时承担买家和卖家角色
+  不允许预约自己的商品；管理员不是交易代确认人
+end note
+
+@enduml
