@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}我的预约{% endblock %}
+{% block content %}
+    <section class="record-panel">
+        <a href="{% url 'my_records' %}">返回我的记录</a>
+        <h1>{{ reservation.product_snapshot.title|default:reservation.product }}</h1>
+        <p>{{ reservation.get_status_display }}</p>
+        <p>预约时间 {{ reservation.created_at|date:"Y-m-d H:i" }}</p>
+    </section>
+{% endblock %}

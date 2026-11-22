@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}没有访问权限{% endblock %}
+{% block content %}
+    <section class="form-panel">
+        <h1>没有访问权限</h1>
+        <p>当前账号没有访问此页面的权限。</p>
+        <a href="{% url 'home' %}">返回商品大厅</a>
+    </section>
+{% endblock %}

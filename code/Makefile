@@ -2,10 +2,10 @@ PYTHON ?= python3
 PORT ?= 8000
 VENV_PYTHON := .venv/bin/python
 
-.PHONY: setup build migrate run test
+.PHONY: setup build migrate run test admin
 .DELETE_ON_ERROR:
 
-setup: .venv/.installed .django-secret
+setup: .venv/.installed .django-secret .mailbox
 
 $(VENV_PYTHON):
 	@"$(PYTHON)" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else "项目依赖需要 Python 3.11 或更高版本，可用 make setup PYTHON=python3.12 选择解释器。")'
@@ -17,6 +17,9 @@ $(VENV_PYTHON):
 
 .django-secret: | $(VENV_PYTHON)
 	@umask 077 && $(VENV_PYTHON) -c 'import secrets; print(secrets.token_urlsafe(48))' > "$@"
+
+.mailbox:
+	@mkdir -p -m 700 "$@"
 
 build: setup
 	$(VENV_PYTHON) -m compileall -q manage.py qiwu
@@ -30,3 +33,6 @@ run: migrate
 
 test: setup
 	$(VENV_PYTHON) manage.py test
+
+admin: migrate
+	$(VENV_PYTHON) manage.py createsuperuser

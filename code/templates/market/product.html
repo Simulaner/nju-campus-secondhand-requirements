@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}我的商品{% endblock %}
+{% block content %}
+    <section class="record-panel">
+        <a href="{% url 'my_records' %}">返回我的记录</a>
+        <h1>{{ product }}</h1>
+        <p>{{ product.get_status_display }}</p>
+        {% if product.description %}<p>{{ product.description }}</p>{% endif %}
+    </section>
+{% endblock %}

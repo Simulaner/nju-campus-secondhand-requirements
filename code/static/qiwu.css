@@ -26,9 +26,11 @@ body {
     padding-block: 1.15rem;
 }
 
-.brand strong {
+.wordmark {
     color: #6746a4;
     font-size: 1.6rem;
+    font-weight: 700;
+    text-decoration: none;
 }
 
 .brand span, .empty-state p {
@@ -55,4 +57,141 @@ h1 {
 
 .empty-state p {
     margin: 0.6rem 0 0;
+}
+
+a, .text-button {
+    color: #5f399a;
+}
+
+nav, .form-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.8rem 1.2rem;
+}
+
+nav {
+    margin-left: auto;
+}
+
+nav a {
+    text-decoration: none;
+}
+
+.nav-action {
+    background: #f0ebf8;
+    padding: 0.45rem 0.8rem;
+    border-radius: 0.5rem;
+}
+
+.text-button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+    text-decoration: underline;
+}
+
+.form-panel, .record-panel {
+    background: white;
+    border: 1px solid #e8e3ee;
+    border-radius: 1rem;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.form-panel {
+    max-width: 27rem;
+    margin: clamp(2rem, 7vh, 5rem) auto;
+}
+
+.form-panel h1, .record-panel h2 {
+    margin: 0 0 1rem;
+}
+
+.intro, .footnote, .helptext {
+    color: #635f70;
+    overflow-wrap: anywhere;
+}
+
+.field {
+    margin: 1.25rem 0;
+}
+
+.field label {
+    display: block;
+    font-weight: 600;
+}
+
+.field input {
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 0.4rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid #afa9b9;
+    border-radius: 0.5rem;
+    font: inherit;
+}
+
+.helptext, .errorlist {
+    margin: 0.35rem 0;
+    font-size: 0.875rem;
+}
+
+.errorlist {
+    padding: 0;
+    list-style: none;
+    color: #9d253b;
+}
+
+.primary {
+    width: 100%;
+    padding: 0.75rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: #6746a4;
+    color: white;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+:focus-visible {
+    outline: 3px solid #6746a4;
+    outline-offset: 2px;
+}
+
+.footnote, .form-actions {
+    margin: 1.2rem 0 0;
+}
+
+.record-panel, .notice {
+    margin-block: 1.25rem;
+}
+
+.notice {
+    padding: 0.8rem 1rem;
+    border-left: 3px solid #6746a4;
+    background: #f0ebf8;
+}
+
+.record-list {
+    list-style: none;
+    padding: 0;
+}
+
+.record-list li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-block: 0.7rem;
+    border-bottom: 1px solid #eeeaf1;
+}
+
+@media (max-width: 40rem) {
+    nav {
+        width: 100%;
+        margin-left: 0;
+    }
 }

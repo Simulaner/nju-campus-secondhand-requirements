@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}商品审核{% endblock %}
+{% block content %}
+    <h1>商品审核</h1>
+    <section class="record-panel">
+        <h2>待审核商品</h2>
+        <ul class="record-list">
+            {% for product in products %}
+                <li>{{ product }} <span>{{ product.seller.display_name }}</span></li>
+            {% empty %}
+                <li>当前没有待审核商品</li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endblock %}

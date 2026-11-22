@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}校园账号登录{% endblock %}
+{% block content %}
+    <section class="form-panel">
+        <h1>校园账号登录</h1>
+        <form method="post">
+            {% csrf_token %}
+            {% include "accounts/fields.html" %}
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+            <button class="primary" type="submit">登录</button>
+        </form>
+        <p class="footnote">还没有账号？<a href="{% url 'register' %}">注册校园账号</a></p>
+    </section>
+{% endblock %}
