@@ -1,0 +1,25 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>商品大厅 · 栖物</title>
+    <link rel="stylesheet" href="{% static 'qiwu.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="page-width brand">
+            <strong>栖物</strong>
+            <span>南京大学校园二手交易平台</span>
+        </div>
+    </header>
+    <main class="page-width">
+        <h1>商品大厅</h1>
+        <section class="empty-state" aria-labelledby="empty-heading">
+            <h2 id="empty-heading">暂无公开商品</h2>
+            <p>通过审核的闲置商品会显示在这里。</p>
+        </section>
+    </main>
+</body>
+</html>

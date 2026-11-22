@@ -1,0 +1,58 @@
+:root {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #242333;
+    background: #f7f7fa;
+}
+
+body {
+    margin: 0;
+}
+
+.page-width {
+    width: min(68rem, calc(100% - 2.5rem));
+    margin-inline: auto;
+}
+
+.site-header {
+    background: white;
+    border-bottom: 1px solid #e8e3ee;
+}
+
+.brand {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+    padding-block: 1.15rem;
+}
+
+.brand strong {
+    color: #6746a4;
+    font-size: 1.6rem;
+}
+
+.brand span, .empty-state p {
+    color: #635f70;
+}
+
+h1 {
+    margin: 2.5rem 0 1rem;
+    font-size: 1.9rem;
+}
+
+.empty-state {
+    padding: 4rem 1rem;
+    background: white;
+    border: 1px solid #e8e3ee;
+    border-radius: 1rem;
+    text-align: center;
+}
+
+.empty-state h2 {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.empty-state p {
+    margin: 0.6rem 0 0;
+}

@@ -1,0 +1,1 @@
+"""Qiwu campus marketplace."""
