@@ -35,10 +35,10 @@ def _check_version(product, version):
         raise ProductConflict("商品已更新，请重新打开商品查看最新状态。")
 
 
-def record_product_action(actor, pk, action, *, failure=""):
+def record_action(actor, object_type, pk, action, *, failure=""):
     AuditLog.objects.create(
         actor=actor,
-        object_type="product",
+        object_type=object_type,
         object_id=pk,
         action=action,
         result="failure" if failure else "success",
@@ -46,7 +46,11 @@ def record_product_action(actor, pk, action, *, failure=""):
     )
 
 
-def _check_actor(actor, *, staff):
+def record_product_action(actor, pk, action, *, failure=""):
+    record_action(actor, "product", pk, action, failure=failure)
+
+
+def require_active_actor(actor, *, staff):
     if not get_user_model().objects.filter(pk=actor.pk, is_active=True, is_staff=staff).exists():
         raise PermissionDenied
 
@@ -72,7 +76,7 @@ def _update_images(product, removed, uploads):
 
 @transaction.atomic
 def save_product(*, actor, pk, creating, action, values):
-    _check_actor(actor, staff=False)
+    require_active_actor(actor, staff=False)
     if creating:
         if values["version"] != 0 or Product.objects.filter(pk=pk).exists():
             raise ProductConflict("这份发布表单已经保存，请从“我的记录”打开商品。")
@@ -131,7 +135,7 @@ def save_product(*, actor, pk, creating, action, values):
 
 @transaction.atomic
 def review_product(*, actor, pk, version, decision, reason):
-    _check_actor(actor, staff=True)
+    require_active_actor(actor, staff=True)
     try:
         product = Product.objects.get(pk=pk)
     except Product.DoesNotExist as exc:

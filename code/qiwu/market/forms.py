@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from PIL import Image
 
 from .models import PUBLIC_PRODUCT_STATUSES, Category, ProductStatus, ReviewDecision
+from .reservations import RESERVATION_ACTIONS
 from .services import SORTS
 
 CONDITIONS = [("", "请选择")] + [(n, f"{n} 成新") for n in range(1, 10)]
@@ -150,3 +151,15 @@ class ReviewForm(forms.Form):
         if data.get("decision") == ReviewDecision.REJECTED and not data.get("reason"):
             self.add_error("reason", "请填写驳回原因，方便卖家修改。")
         return data
+
+
+class ReserveForm(forms.Form):
+    request_key = forms.UUIDField(widget=forms.HiddenInput)
+    version = forms.IntegerField(min_value=1, widget=forms.HiddenInput)
+
+
+class ReservationActionForm(forms.Form):
+    action = forms.ChoiceField(
+        choices=[(name, label) for name, (label, _) in RESERVATION_ACTIONS.items()]
+    )
+    version = forms.IntegerField(min_value=1, widget=forms.HiddenInput)

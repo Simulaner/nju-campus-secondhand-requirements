@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}预约结果{% endblock %}
+{% block content %}
+    <section class="form-panel">
+        <h1>预约结果</h1>
+        <p role="alert">{{ notice }}</p>
+        <div class="form-actions">
+            {% if retry_form %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{ retry_form.request_key }}
+                    {{ retry_form.version }}
+                    <button class="primary compact" type="submit">重试原请求</button>
+                </form>
+            {% endif %}
+            <a href="{{ back_url }}">{{ back_label }}</a>
+        </div>
+    </section>
+{% endblock %}

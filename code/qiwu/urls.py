@@ -3,11 +3,13 @@ from django.urls import path
 
 from .accounts import views as accounts
 from .accounts.forms import CampusLoginForm
+from .market import reservation_views as reservations
 from .market import views as market
 
 urlpatterns = [
     path("", market.home, name="home"),
     path("products/<uuid:pk>/", market.public_product, name="public_product"),
+    path("products/<uuid:pk>/reserve/", reservations.reserve, name="reserve_product"),
     path("product-images/<uuid:pk>/", market.product_image, name="product_image"),
     path("sell/new/", market.edit_product, name="new_product"),
     path("sell/<uuid:pk>/edit/", market.edit_product, name="edit_product"),
@@ -22,6 +24,7 @@ urlpatterns = [
     path("accounts/logout/", LogoutView.as_view(), name="logout"),
     path("me/", market.my_records, name="my_records"),
     path("me/products/<uuid:pk>/", market.my_product, name="my_product"),
-    path("me/reservations/<uuid:pk>/", market.my_reservation, name="my_reservation"),
+    path("me/reservations/<uuid:pk>/", reservations.my_reservation, name="my_reservation"),
+    path("me/reservations/<uuid:pk>/change/", reservations.change, name="change_reservation"),
     path("moderation/reviews/", market.review_queue, name="review_queue"),
 ]

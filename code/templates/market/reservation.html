@@ -1,10 +1,48 @@
 {% extends "base.html" %}
+{% load l10n %}
 {% block title %}我的预约{% endblock %}
 {% block content %}
-    <section class="record-panel">
-        <a href="{% url 'my_records' %}">返回我的记录</a>
+    <div class="page-heading">
         <h1>{{ reservation.product_snapshot.title|default:reservation.product }}</h1>
-        <p>{{ reservation.get_status_display }}</p>
-        <p>预约时间 {{ reservation.created_at|date:"Y-m-d H:i" }}</p>
+        <a href="{% url 'my_records' %}">返回我的记录</a>
+    </div>
+    <section class="record-panel">
+        <div class="record-toolbar">
+            <p class="tag{% if reservation.status == 'pending' %} reserved{% endif %}">{{ reservation.get_status_display }}</p>
+            {% if product_link %}<a href="{{ product_link }}">查看商品</a>{% endif %}
+        </div>
+        <div class="detail-info">
+            <dl>
+                <dt>{% if buying %}卖家{% else %}买家{% endif %}</dt><dd>{{ partner.display_name }}</dd>
+                {% if reservation.price_yuan is not None %}
+                    <dt>预约时价格</dt><dd>¥{{ reservation.price_yuan|floatformat:"2u" }}</dd>
+                {% endif %}
+                <dt>校内面交地点</dt><dd>{{ reservation.product_snapshot.meeting_place|default:"待商定" }}</dd>
+                <dt>预约时间</dt>
+                <dd><time datetime="{{ reservation.created_at|date:'c' }}">{{ reservation.created_at|date:"Y-m-d H:i" }}</time></dd>
+                {% if reservation.status == "pending" %}
+                    <dt>卖家处理期限</dt>
+                    <dd><time datetime="{{ reservation.expires_at|date:'c' }}">{{ reservation.expires_at|date:"Y-m-d H:i" }}</time></dd>
+                {% endif %}
+                {% if reservation.cancel_reason %}<dt>结束原因</dt><dd>{{ reservation.cancel_reason }}</dd>{% endif %}
+            </dl>
+        </div>
+        {% if expired %}
+            <p class="notice">卖家处理期限已过。</p>
+        {% elif reservation.status == "accepted" %}
+            <p class="notice">卖家已接受预约，等待双方线下面交。</p>
+        {% endif %}
+        {% if show_seller_actions or show_cancel %}
+            <form class="form-actions" method="post" action="{% url 'change_reservation' reservation.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="version" value="{{ reservation.version|unlocalize }}">
+                {% if show_seller_actions %}
+                    <button class="primary compact" type="submit" name="action" value="accept">接受预约</button>
+                    <button class="secondary" type="submit" name="action" value="reject">拒绝预约</button>
+                {% else %}
+                    <button class="secondary" type="submit" name="action" value="cancel">取消预约</button>
+                {% endif %}
+            </form>
+        {% endif %}
     </section>
 {% endblock %}

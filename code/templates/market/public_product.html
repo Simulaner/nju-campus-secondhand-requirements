@@ -9,5 +9,17 @@
         <p class="tag{% if product.status == 'reserved' %} reserved{% endif %}">{{ product.get_status_display }}</p>
         {% if product.status == "reserved" %}<p class="intro">该商品已有有效预约。</p>{% endif %}
         {% include "market/detail.html" with show_seller=True %}
+        {% if reserve_form %}
+            <form class="reserve-action" method="post" action="{% url 'reserve_product' product.pk %}">
+                {% csrf_token %}
+                {{ reserve_form.request_key }}
+                {{ reserve_form.version }}
+                <button class="primary compact" type="submit">预约商品</button>
+            </form>
+        {% elif login_to_reserve %}
+            <a class="secondary reserve-action" href="{% url 'login' %}?next={{ request.path|urlencode }}">登录后预约</a>
+        {% elif reservation_id %}
+            <a class="secondary reserve-action" href="{% url 'my_reservation' reservation_id %}">查看我的预约</a>
+        {% endif %}
     </section>
 {% endblock %}

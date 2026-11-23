@@ -143,6 +143,9 @@ class ReservationStatus(models.TextChoices):
     COMPLETED = "completed", "已完成"
 
 
+ACTIVE_RESERVATION_STATUSES = (ReservationStatus.PENDING, ReservationStatus.ACCEPTED)
+
+
 class Reservation(Entity):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name="reservations")
     buyer = models.ForeignKey(
@@ -172,11 +175,24 @@ class Reservation(Entity):
             ),
             models.UniqueConstraint(
                 fields=["product"],
-                condition=Q(status__in=[ReservationStatus.PENDING, ReservationStatus.ACCEPTED]),
+                condition=Q(status__in=list(ACTIVE_RESERVATION_STATUSES)),
                 name="one_active_reservation_per_product",
             ),
         ]
         indexes = [models.Index(fields=["status", "expires_at"])]
+
+    @property
+    def is_active(self):
+        return self.status in ACTIVE_RESERVATION_STATUSES
+
+    @property
+    def price_yuan(self):
+        price_fen = self.product_snapshot.get("price_fen")
+        if price_fen is not None:
+            return Decimal(price_fen).scaleb(-2)
+
+    def pending_expired(self, now):
+        return self.status == ReservationStatus.PENDING and now >= self.expires_at
 
     def save(self, *args, **kwargs):
         if self.product_id and self.seller_id != self.product.seller_id:

@@ -13,14 +13,15 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods
 
-from .forms import ProductForm, ReviewForm, SearchForm
+from .forms import ProductForm, ReserveForm, ReviewForm, SearchForm
 from .models import (
+    ACTIVE_RESERVATION_STATUSES,
     PUBLIC_PRODUCT_STATUSES,
     Product,
     ProductImageContent,
     ProductStatus,
-    Reservation,
 )
+from .reservations import participant_reservations
 from .services import (
     ProductConflict,
     public_products,
@@ -42,10 +43,32 @@ def home(request):
     return render(request, "home.html", {"form": form, "page": page})
 
 
+@never_cache
 @require_GET
 def public_product(request, pk):
     product = get_object_or_404(with_product_images(public_products()), pk=pk)
-    return render(request, "market/public_product.html", {"product": product})
+    reservable = (
+        product.status == ProductStatus.PUBLISHED
+        and product.seller.is_active
+        and product.price_fen is not None
+    )
+    context = {
+        "product": product,
+        "login_to_reserve": reservable and not request.user.is_authenticated,
+    }
+    if request.user.is_authenticated:
+        if reservable and not request.user.is_staff and product.seller_id != request.user.pk:
+            context["reserve_form"] = ReserveForm(
+                initial={"version": product.version, "request_key": uuid.uuid4()}
+            )
+        if product.status == ProductStatus.RESERVED:
+            context["reservation_id"] = (
+                participant_reservations(request.user)
+                .filter(product=product, status__in=ACTIVE_RESERVATION_STATUSES)
+                .values_list("pk", flat=True)
+                .first()
+            )
+    return render(request, "market/public_product.html", context)
 
 
 @never_cache
@@ -62,10 +85,6 @@ def product_image(request, pk):
     return HttpResponse(bytes(content.data), content_type=content.image.mime_type)
 
 
-def _participant_reservations(user):
-    return Reservation.objects.filter(Q(buyer=user) | Q(seller=user)).select_related("product")
-
-
 @login_required
 @require_GET
 def my_records(request):
@@ -73,7 +92,7 @@ def my_records(request):
     status = request.GET.get("status", "")
     if status:
         products = products.filter(status=status)
-    reservations = _participant_reservations(request.user).order_by("-created_at")
+    reservations = participant_reservations(request.user).order_by("-created_at")
     return render(
         request,
         "market/records.html",
@@ -167,13 +186,6 @@ def edit_product(request, pk=None):
         "market/edit.html",
         {"product": product, "form": form, "creating": creating, "token": token},
     )
-
-
-@login_required
-@require_GET
-def my_reservation(request, pk):
-    reservation = get_object_or_404(_participant_reservations(request.user), pk=pk)
-    return render(request, "market/reservation.html", {"reservation": reservation})
 
 
 @login_required

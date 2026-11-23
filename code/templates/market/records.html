@@ -26,7 +26,10 @@
         <h2>我参与的预约</h2>
         <ul class="record-list">
             {% for reservation in reservations %}
-                <li><a href="{% url 'my_reservation' reservation.pk %}">{{ reservation.product_snapshot.title|default:reservation.product }}</a><span>{{ reservation.get_status_display }}</span></li>
+                <li>
+                    <a href="{% url 'my_reservation' reservation.pk %}">{{ reservation.product_snapshot.title|default:reservation.product }}</a>
+                    <span>{% if reservation.buyer_id == user.pk %}作为买家{% else %}作为卖家{% endif %} · {{ reservation.get_status_display }}</span>
+                </li>
             {% empty %}
                 <li>暂无预约记录</li>
             {% endfor %}

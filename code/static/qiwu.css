@@ -380,6 +380,10 @@ nav a {
     max-width: 49rem;
 }
 
+.reserve-action {
+    margin-top: 1.25rem;
+}
+
 .form-grid .field {
     margin-block: 0.5rem;
 }
