@@ -1,0 +1,26 @@
+<div class="detail-grid">
+    {% with gallery=product.images.all %}
+        {% if gallery %}
+            <div class="detail-gallery">
+                {% for image in gallery %}
+                    <a href="{% url 'product_image' image.pk %}">
+                        <img src="{% url 'product_image' image.pk %}" alt="{{ product }} · 图片 {{ forloop.counter }}"{% if not forloop.first %} loading="lazy"{% endif %}>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <div class="detail-info">
+        {% if product.price_yuan is not None %}<p class="price">¥{{ product.price_yuan|floatformat:"2u" }}</p>{% endif %}
+        <dl>
+            <dt>分类</dt><dd>{{ product.category|default:"未选择" }}</dd>
+            <dt>新旧程度</dt><dd>{% if product.condition %}{{ product.condition }} 成新{% else %}未填写{% endif %}</dd>
+            <dt>校内面交地点</dt><dd>{{ product.meeting_place|default:"待商定" }}</dd>
+            {% if show_seller %}<dt>卖家</dt><dd>{{ product.seller.display_name }}</dd>{% endif %}
+        </dl>
+        {% if product.description %}
+            <h2>商品描述</h2>
+            <p class="product-description">{{ product.description }}</p>
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}商品编辑{% endblock %}
+{% block content %}
+    <section class="form-panel">
+        <h1>{{ notice }}</h1>
+        {% if product %}
+            <a href="{% url 'my_product' product.pk %}">查看商品当前状态</a>
+        {% else %}
+            <a href="{% url 'my_records' %}">查看我的发布</a>
+        {% endif %}
+    </section>
+{% endblock %}

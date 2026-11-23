@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}审核 {{ product }}{% endblock %}
+{% block content %}
+    <div class="page-heading">
+        <h1>审核 {{ product }}</h1>
+        <a href="{% url 'review_queue' %}">返回待审核队列</a>
+    </div>
+    <section class="record-panel">
+        {% include "market/detail.html" with show_seller=True %}
+    </section>
+    <form class="record-panel editor" method="post">
+        {% csrf_token %}
+        {{ form.version }}
+        {{ form.version.errors }}
+        {{ form.decision.errors }}
+        {{ form.non_field_errors }}
+        <div class="field">{{ form.reason.as_field_group }}</div>
+        <p class="intro">驳回时填写原因，卖家可以查看。</p>
+        <div class="form-actions">
+            <button class="primary compact" type="submit" name="decision" value="approved">通过并发布</button>
+            <button class="secondary" type="submit" name="decision" value="rejected">驳回商品</button>
+        </div>
+    </form>
+{% endblock %}

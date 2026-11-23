@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ product }}{% endblock %}
+{% block content %}
+    <div class="page-heading">
+        <h1>{{ product }}</h1>
+        <a href="{% url 'home' %}">返回商品大厅</a>
+    </div>
+    <section class="record-panel">
+        <p class="tag{% if product.status == 'reserved' %} reserved{% endif %}">{{ product.get_status_display }}</p>
+        {% if product.status == "reserved" %}<p class="intro">该商品已有有效预约。</p>{% endif %}
+        {% include "market/detail.html" with show_seller=True %}
+    </section>
+{% endblock %}

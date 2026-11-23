@@ -1,8 +1,8 @@
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.urls import reverse
 
 
-class HomePageTests(SimpleTestCase):
+class HomePageTests(TestCase):
     def test_public_home_displays_the_marketplace(self):
         response = self.client.get(reverse("home"))
 

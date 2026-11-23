@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -30,6 +31,9 @@ class ProductStatus(models.TextChoices):
     RESERVED = "reserved", "已预约"
     SOLD = "sold", "已售出"
     OFFLINE = "offline", "已下架"
+
+
+PUBLIC_PRODUCT_STATUSES = (ProductStatus.PUBLISHED, ProductStatus.RESERVED)
 
 
 class Product(Entity):
@@ -65,6 +69,15 @@ class Product(Entity):
     def __str__(self):
         return self.title or "未命名草稿"
 
+    @property
+    def price_yuan(self):
+        if self.price_fen is not None:
+            return Decimal(self.price_fen).scaleb(-2)
+
+    @property
+    def editable(self):
+        return self.status in (ProductStatus.DRAFT, ProductStatus.REJECTED, ProductStatus.PUBLISHED)
+
 
 class ProductImage(Entity):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
@@ -74,6 +87,7 @@ class ProductImage(Entity):
     size_bytes = models.PositiveIntegerField()
 
     class Meta:
+        ordering = ["position"]
         constraints = [
             models.UniqueConstraint(
                 fields=["product", "position"], name="product_image_position_unique"
@@ -82,6 +96,14 @@ class ProductImage(Entity):
                 condition=Q(position__range=(1, 9)), name="product_image_slot_valid"
             ),
         ]
+
+
+class ProductImageContent(models.Model):
+    # Keep image bytes out of regular list queries and commit them with the product.
+    image = models.OneToOneField(
+        ProductImage, primary_key=True, on_delete=models.CASCADE, related_name="content"
+    )
+    data = models.BinaryField()
 
 
 class ReviewDecision(models.TextChoices):

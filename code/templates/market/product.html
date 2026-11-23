@@ -1,10 +1,31 @@
 {% extends "base.html" %}
 {% block title %}我的商品{% endblock %}
 {% block content %}
-    <section class="record-panel">
-        <a href="{% url 'my_records' %}">返回我的记录</a>
+    <div class="page-heading">
         <h1>{{ product }}</h1>
-        <p>{{ product.get_status_display }}</p>
-        {% if product.description %}<p>{{ product.description }}</p>{% endif %}
+        <a href="{% url 'my_records' %}">返回我的记录</a>
+    </div>
+    <section class="record-panel">
+        <div class="record-toolbar">
+            <p class="tag">{{ product.get_status_display }}</p>
+            {% if product.editable %}
+                <a class="secondary" href="{% url 'edit_product' product.pk %}">{% if product.status == "draft" %}继续编辑{% else %}编辑商品{% endif %}</a>
+            {% endif %}
+        </div>
+        {% include "market/detail.html" %}
     </section>
+    {% if reviews %}
+        <section class="record-panel">
+            <h2>审核记录</h2>
+            <ul class="review-history">
+                {% for review in reviews %}
+                    <li>
+                        <strong>{{ review.get_decision_display }}</strong>
+                        <time datetime="{{ review.created_at|date:'c' }}">{{ review.created_at|date:"Y-m-d H:i" }}</time>
+                        {% if review.reason %}<p class="product-description">{{ review.reason }}</p>{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
 {% endblock %}

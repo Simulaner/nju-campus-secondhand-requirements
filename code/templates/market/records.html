@@ -4,6 +4,16 @@
     <h1>我的记录</h1>
     <section class="record-panel">
         <h2>我的发布</h2>
+        <form class="record-filter" method="get">
+            <label for="product-status">商品状态</label>
+            <select id="product-status" name="status">
+                <option value="">全部状态</option>
+                {% for value, label in states %}
+                    <option value="{{ value }}"{% if value == status %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button class="secondary" type="submit">筛选</button>
+        </form>
         <ul class="record-list">
             {% for product in products %}
                 <li><a href="{% url 'my_product' product.pk %}">{{ product }}</a><span>{{ product.get_status_display }}</span></li>

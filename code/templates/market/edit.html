@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{% if creating %}发布闲置{% else %}编辑商品{% endif %}{% endblock %}
+{% block content %}
+    <div class="page-heading">
+        <h1>{% if creating %}发布闲置{% else %}编辑商品{% endif %}</h1>
+        {% if creating %}
+            <a href="{% url 'my_records' %}">我的发布</a>
+        {% else %}
+            <a href="{% url 'my_product' product.pk %}">返回商品</a>
+        {% endif %}
+    </div>
+    <form class="record-panel editor" method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {% if creating %}<input type="hidden" name="draft_token" value="{{ token }}">{% endif %}
+        {{ form.version }}
+        {{ form.version.errors }}
+        {{ form.non_field_errors }}
+        {% if product.status == "published" %}
+            <p class="notice">保存改动后，商品将暂停公开并重新审核。</p>
+        {% else %}
+            <p class="intro">可以先保存草稿。送审时须填写基本信息并附上至少一张图片。</p>
+        {% endif %}
+        <div class="form-grid">
+            <div class="field">{{ form.title.as_field_group }}</div>
+            <div class="field">{{ form.category.as_field_group }}</div>
+            <div class="field">{{ form.price.as_field_group }}</div>
+            <div class="field">{{ form.condition.as_field_group }}</div>
+        </div>
+        <div class="field">{{ form.description.as_field_group }}</div>
+        <div class="field">{{ form.meeting_place.as_field_group }}</div>
+        {% if form.existing %}
+            <fieldset class="image-inputs">
+                <legend>已有图片</legend>
+                {{ form.remove_images.errors }}
+                <div class="manage-images">
+                    {% for choice in form.remove_images %}
+                        <label for="{{ choice.id_for_label }}">
+                            <img src="{% url 'product_image' choice.data.value %}" alt="{{ choice.choice_label }}">
+                            <span>{{ choice.tag }} 移除{{ choice.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+        {% endif %}
+        <div class="field">{{ form.images.as_field_group }}</div>
+        <div class="form-actions">
+            {% if product.status == "published" %}
+                <button class="primary compact" type="submit" name="action" value="save">保存修改</button>
+            {% else %}
+                <button class="secondary" type="submit" name="action" value="save">{% if product.status == "rejected" %}保存修改{% else %}保存草稿{% endif %}</button>
+                <button class="primary compact" type="submit" name="action" value="submit">提交审核</button>
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}

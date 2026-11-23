@@ -1,8 +1,65 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>商品大厅</h1>
-    <section class="empty-state" aria-labelledby="empty-heading">
-        <h2 id="empty-heading">暂无公开商品</h2>
-        <p>通过审核的闲置商品会显示在这里。</p>
-    </section>
+    <form class="record-panel search-panel" method="get">
+        <div class="search-bar">
+            <div class="field">{{ form.q.as_field_group }}</div>
+            <button class="primary compact" type="submit">搜索闲置</button>
+        </div>
+        <div class="filters">
+            <div class="field">{{ form.category.as_field_group }}</div>
+            <div class="field">{{ form.min_price.as_field_group }}</div>
+            <div class="field">{{ form.max_price.as_field_group }}</div>
+            <div class="field">{{ form.condition.as_field_group }}</div>
+            <div class="field">{{ form.status.as_field_group }}</div>
+            <div class="field">{{ form.sort.as_field_group }}</div>
+        </div>
+        {% if request.GET %}<a class="reset-search" href="{% url 'home' %}">清除筛选</a>{% endif %}
+    </form>
+    {% if page.object_list %}
+        <div class="result-heading">
+            <h2>闲置商品</h2>
+            <p>共 {{ page.paginator.count }} 件</p>
+        </div>
+        <ul class="product-grid">
+            {% for product in page %}
+                <li>
+                    <a class="product-card" href="{% url 'public_product' product.pk %}">
+                        {% with image=product.images.all.0 %}
+                            {% if image %}
+                                <img class="product-cover" src="{% url 'product_image' image.pk %}" alt="" loading="lazy">
+                            {% else %}
+                                <div class="product-cover cover-placeholder" aria-hidden="true">{{ product.category|default:"暂无图片" }}</div>
+                            {% endif %}
+                        {% endwith %}
+                        <div class="card-info">
+                            <span class="tag{% if product.status == 'reserved' %} reserved{% endif %}">{{ product.get_status_display }}</span>
+                            <h3>{{ product }}</h3>
+                            <p class="card-meta">
+                                {% if product.category %}<span>{{ product.category }}</span>{% endif %}
+                                {% if product.condition %}<span>{{ product.condition }} 成新</span>{% endif %}
+                            </p>
+                            {% if product.price_yuan is not None %}<p class="price">¥{{ product.price_yuan|floatformat:"2u" }}</p>{% endif %}
+                        </div>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% if page.has_other_pages %}
+            <nav class="pagination" aria-label="搜索结果页码">
+                {% if page.has_previous %}<a href="{% querystring page=page.previous_page_number %}">上一页</a>{% endif %}
+                <span>第 {{ page.number }} / {{ page.paginator.num_pages }} 页</span>
+                {% if page.has_next %}<a href="{% querystring page=page.next_page_number %}">下一页</a>{% endif %}
+            </nav>
+        {% endif %}
+    {% elif not form.errors %}
+        <section class="empty-state" aria-labelledby="empty-heading">
+            {% if request.GET %}
+                <h2 id="empty-heading">没有符合条件的商品</h2>
+            {% else %}
+                <h2 id="empty-heading">暂无公开商品</h2>
+                <p>通过审核的闲置商品会显示在这里。</p>
+            {% endif %}
+        </section>
+    {% endif %}
 {% endblock %}
