@@ -4,7 +4,7 @@
     <div class="page-heading"><h1>{{ product }}</h1><a href="{% url 'managed_products' %}">返回商品管理</a></div>
     <section class="record-panel">
         <div class="record-toolbar">
-            <p class="tag">{{ product.get_status_display }}</p>
+            <p class="tag" data-state="{{ product.status }}">{{ product.get_status_display }}</p>
             {% if product.relist_blocked %}<span>限制重审</span>{% endif %}
             {% if product.status == "pending" %}<a class="secondary" href="{% url 'moderate' product.pk %}">审核商品</a>{% endif %}
         </div>

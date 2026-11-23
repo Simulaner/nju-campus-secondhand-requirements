@@ -1,65 +1,101 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-    <h1>商品大厅</h1>
-    <form class="record-panel search-panel" method="get">
-        <div class="search-bar">
-            <div class="field">{{ form.q.as_field_group }}</div>
-            <button class="primary compact" type="submit">搜索闲置</button>
-        </div>
-        <div class="filters">
-            <div class="field">{{ form.category.as_field_group }}</div>
-            <div class="field">{{ form.min_price.as_field_group }}</div>
-            <div class="field">{{ form.max_price.as_field_group }}</div>
-            <div class="field">{{ form.condition.as_field_group }}</div>
-            <div class="field">{{ form.status.as_field_group }}</div>
-            <div class="field">{{ form.sort.as_field_group }}</div>
-        </div>
-        {% if request.GET %}<a class="reset-search" href="{% url 'home' %}">清除筛选</a>{% endif %}
-    </form>
-    {% if page.object_list %}
-        <div class="result-heading">
-            <h2>闲置商品</h2>
-            <p>共 {{ page.paginator.count }} 件</p>
-        </div>
-        <ul class="product-grid">
-            {% for product in page %}
-                <li>
-                    <a class="product-card" href="{% url 'public_product' product.pk %}">
-                        {% with image=product.images.all.0 %}
-                            {% if image %}
-                                <img class="product-cover" src="{% url 'product_image' image.pk %}" alt="" loading="lazy">
-                            {% else %}
-                                <div class="product-cover cover-placeholder" aria-hidden="true">{{ product.category|default:"暂无图片" }}</div>
-                            {% endif %}
-                        {% endwith %}
-                        <div class="card-info">
-                            <span class="tag{% if product.status == 'reserved' %} reserved{% endif %}">{{ product.get_status_display }}</span>
-                            <h3>{{ product }}</h3>
-                            <p class="card-meta">
-                                {% if product.category %}<span>{{ product.category }}</span>{% endif %}
-                                {% if product.condition %}<span>{{ product.condition }} 成新</span>{% endif %}
-                            </p>
-                            {% if product.price_yuan is not None %}<p class="price">¥{{ product.price_yuan|floatformat:"2u" }}</p>{% endif %}
-                        </div>
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-        {% if page.has_other_pages %}
-            <nav class="pagination" aria-label="搜索结果页码">
-                {% if page.has_previous %}<a href="{% querystring page=page.previous_page_number %}">上一页</a>{% endif %}
-                <span>第 {{ page.number }} / {{ page.paginator.num_pages }} 页</span>
-                {% if page.has_next %}<a href="{% querystring page=page.next_page_number %}">下一页</a>{% endif %}
-            </nav>
-        {% endif %}
-    {% elif not form.errors %}
-        <section class="empty-state" aria-labelledby="empty-heading">
-            {% if request.GET %}
-                <h2 id="empty-heading">没有符合条件的商品</h2>
-            {% else %}
-                <h2 id="empty-heading">暂无公开商品</h2>
-                <p>通过审核的闲置商品会显示在这里。</p>
-            {% endif %}
+    {% if cover %}
+        <section class="market-cover" aria-label="最新上架">
+            <a class="product-card" href="{% url 'public_product' cover.pk %}">
+                <div class="cover-copy">
+                    <span class="eyeline">最新上架{% if cover.category %} · {{ cover.category }}{% endif %}</span>
+                    <h2>{{ cover }}</h2>
+                    <p class="card-meta">{% if cover.condition %}{{ cover.condition }} 成新 · {% endif %}{{ cover.meeting_place|default:"面交地点待商定" }}</p>
+                    <div class="cover-action"><strong class="price">¥{{ cover.price_yuan|floatformat:"2u" }}</strong><span class="text-link">查看商品 →</span></div>
+                </div>
+                {% with photo=cover.images.all.0 %}
+                    {% if photo %}<img class="feature-photo" src="{% url 'product_image' photo.pk %}" alt="">
+                    {% else %}<div class="feature-photo cover-placeholder">暂无图片</div>{% endif %}
+                {% endwith %}
+            </a>
+        </section>
+    {% elif not page.paginator.count and not form.errors and not filtered %}
+        <section class="market-cover empty-cover" aria-labelledby="empty-title">
+            <div class="cover-copy">
+                <span class="eyeline">校园二手集市</span>
+                <h2 id="empty-title">暂无公开商品</h2>
+                <p class="intro">同学发布的闲置通过审核后，就会出现在这里。</p>
+                {% if user.is_staff %}
+                    <a class="primary compact" href="{% url 'review_queue' %}">查看待审核商品 →</a>
+                {% elif user.is_authenticated %}
+                    <a class="primary compact" href="{% url 'new_product' %}">发布第一件闲置 →</a>
+                {% else %}
+                    <a class="primary compact" href="{% url 'login' %}?next={% url 'new_product' %}">登录后发布闲置 →</a>
+                {% endif %}
+            </div>
+            <img class="feature-photo" src="{% static 'reading-table.jpg' %}" alt="">
         </section>
     {% endif %}
+    <form id="market-search" method="get">
+        <div class="market-heading">
+            <div class="shelf-title"><h1>商品大厅</h1><span>共 {{ page.paginator.count }} 件</span></div>
+            <div class="catalog-search">
+                <label class="visually-hidden" for="{{ form.q.id_for_label }}">商品名称</label>
+                {{ form.q }}{{ form.category.as_hidden }}
+                <button class="primary compact" type="submit">搜索闲置</button>
+            </div>
+        </div>
+        {{ form.q.errors }}{{ form.category.errors }}{{ form.non_field_errors }}
+        <div class="market-toolbar">
+            <nav class="category-links" aria-label="商品分类">
+                <a href="{% querystring category=None page=None %}"{% if not form.category.value %} aria-current="true"{% endif %}>全部</a>
+                {% for category in form.fields.category.queryset %}
+                    <a href="{% querystring category=category.pk page=None %}"{% if form.category.value == category.pk|stringformat:"s" %} aria-current="true"{% endif %}>{{ category }}</a>
+                {% endfor %}
+            </nav>
+            <label class="market-sort">排序 {{ form.sort }}</label>
+        </div>
+        {{ form.sort.errors }}
+        <details class="advanced-filters"{% if form.min_price.value or form.max_price.value or form.condition.value or form.status.value or form.errors %} open{% endif %}>
+            <summary>更多筛选</summary>
+            <div class="filters">
+                <div class="field">{{ form.min_price.as_field_group }}</div>
+                <div class="field">{{ form.max_price.as_field_group }}</div>
+                <div class="field">{{ form.condition.as_field_group }}</div>
+                <div class="field">{{ form.status.as_field_group }}</div>
+                <button class="secondary" type="submit">应用筛选</button>
+            </div>
+        </details>
+    </form>
+    {% if filtered or request.GET.sort %}<a class="reset-search" href="{% url 'home' %}">清除筛选</a>{% endif %}
+    {% if products %}
+        <ul class="product-grid">
+            {% for product in products %}
+                <li><a class="product-card" href="{% url 'public_product' product.pk %}">
+                    <div class="card-photo">
+                        {% with image=product.images.all.0 %}
+                            {% if image %}<img class="product-cover" src="{% url 'product_image' image.pk %}" alt="" loading="lazy">
+                            {% else %}<div class="product-cover cover-placeholder">暂无图片</div>{% endif %}
+                        {% endwith %}
+                        {% if product.status == 'reserved' %}<span class="tag reserved">已预约</span>{% endif %}
+                    </div>
+                    <div class="card-info">
+                        <div class="card-line"><h3>{{ product }}</h3>{% if product.price_yuan is not None %}<strong class="price">¥{{ product.price_yuan|floatformat:"2u" }}</strong>{% endif %}</div>
+                        <p class="card-meta">{{ product.category|default:"未分类" }}{% if product.condition %} · {{ product.condition }} 成新{% endif %}{% if product.meeting_place %} · {{ product.meeting_place }}{% endif %}</p>
+                    </div>
+                </a></li>
+            {% endfor %}
+        </ul>
+    {% elif filtered and not form.errors %}
+        <section class="empty-state"><h2>没有符合条件的商品</h2><p>可以换个关键词或调整筛选条件。</p></section>
+    {% endif %}
+    {% if page.has_other_pages %}
+        <nav class="pagination" aria-label="搜索结果页码">
+            {% if page.has_previous %}<a href="{% querystring page=page.previous_page_number %}">上一页</a>{% endif %}
+            <span>第 {{ page.number }} / {{ page.paginator.num_pages }} 页</span>
+            {% if page.has_next %}<a href="{% querystring page=page.next_page_number %}">下一页</a>{% endif %}
+        </nav>
+    {% endif %}
+    <script>
+        document.getElementById("id_sort").addEventListener("change", function () {
+            this.form.requestSubmit();
+        });
+    </script>
 {% endblock %}

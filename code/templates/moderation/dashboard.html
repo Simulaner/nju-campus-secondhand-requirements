@@ -4,7 +4,7 @@
     <h1>平台统计</h1>
     <dl class="stat-grid">
         <div class="stat-card"><dt>商品总数</dt><dd>{{ product_total }}</dd></div>
-        <div class="stat-card"><dt>待审核</dt><dd>{{ pending_total }}</dd></div>
+        <div class="stat-card"><dt><a href="{% url 'review_queue' %}">待审核 →</a></dt><dd><a href="{% url 'review_queue' %}" aria-label="查看 {{ pending_total }} 件待审核商品">{{ pending_total }}</a></dd></div>
         <div class="stat-card"><dt>有效预约</dt><dd>{{ active_total }}</dd></div>
         <div class="stat-card"><dt>完成交易</dt><dd>{{ trade_total }}</dd></div>
     </dl>

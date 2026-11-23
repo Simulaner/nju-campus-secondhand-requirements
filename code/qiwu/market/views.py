@@ -44,9 +44,30 @@ logger = logging.getLogger(__name__)
 @require_GET
 def home(request):
     form = SearchForm(request.GET)
-    items = search_products(form.cleaned_data) if form.is_valid() else Product.objects.none()
+    valid = form.is_valid()
+    items = search_products(form.cleaned_data) if valid else Product.objects.none()
+    filtered = any(request.GET.get(name, "").strip() for name in form.fields if name != "sort")
+    cover_id = None
+    if valid and not filtered and not form.cleaned_data["sort"]:
+        cover_id = (
+            items.filter(status=ProductStatus.PUBLISHED, price_fen__isnull=False)
+            .values_list("pk", flat=True)
+            .first()
+        )
+        if cover_id:
+            # Pin before pagination so a reserved item can never displace or duplicate the cover.
+            items = items.alias(is_cover=Q(pk=cover_id)).order_by("-is_cover", "-published_at", "pk")
     page = Paginator(items, 24).get_page(request.GET.get("page"))
-    return render(request, "home.html", {"form": form, "page": page})
+    products = list(page)
+    first = products[0] if products else None
+    cover = None
+    if first and first.pk == cover_id and first.status == ProductStatus.PUBLISHED:
+        cover = products.pop(0)
+    return render(
+        request,
+        "home.html",
+        {"form": form, "page": page, "products": products, "cover": cover, "filtered": filtered},
+    )
 
 
 @never_cache

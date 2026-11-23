@@ -4,7 +4,7 @@
     <div class="page-heading"><h1>{{ account.display_name }}</h1><a href="{% url 'managed_accounts' %}">返回用户管理</a></div>
     <section class="record-panel editor">
         <div class="record-toolbar">
-            <span class="tag">{% if account.is_active %}正常{% else %}已停用{% endif %}</span>
+            <span class="tag" data-state="{% if account.is_active %}active{% else %}disabled{% endif %}">{% if account.is_active %}正常{% else %}已停用{% endif %}</span>
             <span>{{ account.email }}</span>
         </div>
         <div class="detail-info">

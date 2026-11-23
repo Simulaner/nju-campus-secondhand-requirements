@@ -13,7 +13,7 @@
                             <td><a href="{% url 'managed_product' product.pk %}">{{ product }}</a></td>
                             <td>{{ product.seller.display_name }}</td>
                             <td>{{ product.category|default:"未分类" }}</td>
-                            <td><span class="tag">{{ product.get_status_display }}</span>{% if product.relist_blocked %} <span class="muted">限制重审</span>{% endif %}</td>
+                            <td><span class="tag" data-state="{{ product.status }}">{{ product.get_status_display }}</span>{% if product.relist_blocked %} <span class="muted">限制重审</span>{% endif %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

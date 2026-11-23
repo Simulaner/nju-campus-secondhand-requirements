@@ -426,6 +426,25 @@ class PublicCatalogTests(TestCase):
         second = self.client.get(reverse("home"), {"q": "课本", "sort": "price_up", "page": 2})
         self.assertEqual(len(second.context["page"]), 1)
 
+    def test_cover_appears_once_across_pages_and_yields_to_filters(self):
+        cover = self.item("校园用书")
+        for i in range(24):
+            self.item(f"已占用 {i}", status=ProductStatus.RESERVED)
+        self.item("草稿", status=ProductStatus.DRAFT)
+        first = self.client.get(reverse("home"))
+        self.assertEqual(first.context["cover"], cover)
+        self.assertNotIn(cover, first.context["products"])
+        self.assertEqual(len(first.context["products"]), 23)
+        second = self.client.get(reverse("home"), {"page": 2})
+        self.assertIsNone(second.context["cover"])
+        self.assertNotIn(cover, second.context["products"])
+        chronological = self.client.get(reverse("home"), {"sort": "newest"})
+        self.assertIsNone(chronological.context["cover"])
+        self.assertNotIn(cover, chronological.context["products"])
+        filtered = self.client.get(reverse("home"), {"q": "校园"})
+        self.assertIsNone(filtered.context["cover"])
+        self.assertEqual(filtered.context["products"], [cover])
+
     def test_seller_state_filter_does_not_include_other_sellers(self):
         other = User.objects.create_user("other@nju.edu.cn", display_name="另一卖家")
         own = self.item("自己草稿", status=ProductStatus.DRAFT)

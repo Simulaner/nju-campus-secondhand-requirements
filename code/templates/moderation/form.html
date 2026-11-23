@@ -7,5 +7,5 @@
         {{ form.reason.as_field_group }}
         {% if action == "product_violation" or action == "account_disable" %}<p class="helptext">此操作需要填写原因。</p>{% endif %}
     </div>
-    <button class="primary compact" type="submit">{{ action.label }}</button>
+    <button class="primary compact{% if action == 'product_violation' or action == 'account_disable' %} danger{% endif %}" type="submit">{{ action.label }}</button>
 </form>

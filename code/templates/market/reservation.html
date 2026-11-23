@@ -8,7 +8,7 @@
     </div>
     <section class="record-panel">
         <div class="record-toolbar">
-            <p class="tag{% if reservation.status == 'pending' %} reserved{% endif %}">{{ reservation.get_status_display }}</p>
+            <p class="tag" data-state="{{ reservation.status }}">{{ reservation.get_status_display }}</p>
             {% if product_link %}<a href="{{ product_link }}">查看商品</a>{% endif %}
         </div>
         <div class="detail-info">
@@ -25,18 +25,18 @@
                     <dd><time datetime="{{ reservation.expires_at|date:'c' }}">{{ reservation.expires_at|date:"Y-m-d H:i" }}</time></dd>
                 {% endif %}
                 {% if reservation.cancel_reason %}<dt>结束原因</dt><dd>{{ reservation.cancel_reason }}</dd>{% endif %}
-                {% if handover or reservation.buyer_confirmed_at or reservation.seller_confirmed_at %}
-                    <dt>买家确认</dt>
-                    <dd>{{ reservation.buyer_confirmed_at|date:"Y-m-d H:i"|default:"待确认" }}</dd>
-                    <dt>卖家确认</dt>
-                    <dd>{{ reservation.seller_confirmed_at|date:"Y-m-d H:i"|default:"待确认" }}</dd>
-                {% endif %}
                 {% if trade %}
                     <dt>成交价</dt><dd>¥{{ trade.agreed_price_yuan|floatformat:"2u" }}</dd>
                     <dt>成交时间</dt><dd><time datetime="{{ trade.completed_at|date:'c' }}">{{ trade.completed_at|date:"Y-m-d H:i" }}</time></dd>
                 {% endif %}
             </dl>
         </div>
+        {% if handover or reservation.buyer_confirmed_at or reservation.seller_confirmed_at %}
+            <section class="handover-progress" aria-label="双方确认进度">
+                <div{% if reservation.buyer_confirmed_at %} class="confirmed"{% endif %}><strong>买家确认</strong><span>{{ reservation.buyer_confirmed_at|date:"Y-m-d H:i"|default:"待确认" }}</span></div>
+                <div{% if reservation.seller_confirmed_at %} class="confirmed"{% endif %}><strong>卖家确认</strong><span>{{ reservation.seller_confirmed_at|date:"Y-m-d H:i"|default:"待确认" }}</span></div>
+            </section>
+        {% endif %}
         {% if expired %}
             <p class="notice">卖家处理期限已过。</p>
         {% elif handover and own_confirmation %}
