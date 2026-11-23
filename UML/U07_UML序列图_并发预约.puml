@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 竞争预约与请求重放
+actor "买家 A / B" as Buyer
+boundary "商品详情" as UI
+control "reserve_product" as Service
+database "SQLite" as DB
+control "events.py" as Audit
+Buyer -> UI : 提交预约
+UI -> Service : 商品 ID、页面版本、request_key
+Service -> DB : BEGIN IMMEDIATE
+Service -> DB : 核对普通账号和已提交回执\n按发起人与 request_key 查询
+alt 已有回执且请求摘要相同
+  DB --> Service : 原预约 ID
+  Service -> DB : 结束事务
+  Service --> UI : 打开原预约
+else 新请求且状态校验通过
+  Service -> DB : 校验归属、当前状态与版本\n条件更新商品为已预约
+  Service -> DB : 写预约、回执、通知和成功审计
+  Service -> DB : COMMIT
+  Service --> UI : 打开新预约
+else 回执冲突、状态错误或写入失败
+  Service -> DB : ROLLBACK
+  Service -> Audit : 独立写失败审计
+  Service --> UI : 显示冲突或可重试错误
+end
+note over Service, DB
+  数据库保证每件商品最多一条有效预约
+  请求摘要绑定商品 ID 与版本
+end note
+
+@enduml

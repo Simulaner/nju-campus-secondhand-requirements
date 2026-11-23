@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 下架与超时竞争
+actor "卖家 / 管理员" as Actor
+control "下架业务服务" as Offline
+control "启动补扫 / 运行扫描" as Scan
+control "expire_reservation" as Expiry
+database "SQLite" as DB
+alt 下架先提交
+  Actor -> Offline : 主动下架或违规下架
+  Offline -> DB : 核对发布批次或管理版本
+  Offline -> DB : 下架并取消有效预约\n清理联系方式，写入通知及审计
+  Offline -> DB : COMMIT
+  Scan -> Expiry : 处理候选到期预约
+  Expiry -> DB : 重新读取预约
+  DB --> Expiry : 已取消，无状态变更
+else 到期先提交
+  Scan -> Expiry : 处理候选到期预约
+  Expiry -> DB : 核对仍待确认且已到期
+  Expiry -> DB : 预约标为超时\n仅释放仍保持预约状态的商品
+  Expiry -> DB : 写入通知和审计，COMMIT
+  Actor -> Offline : 随后提交下架
+  Offline -> DB : 卖家核对原发布批次\n管理员有版本变化时先刷新
+  Offline -> DB : 将当前公开商品下架
+end
+note over Scan, DB
+  启动时补扫，运行中每 15 秒扫描
+  每笔预约用同一写事务重新校验
+  失败先回滚，再写失败审计
+end note
+
+@enduml

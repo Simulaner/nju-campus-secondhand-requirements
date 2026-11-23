@@ -1,0 +1,77 @@
+{
+  "plantuml_version": "1.2025.10",
+  "diagrams": [
+    {
+      "source": "UML/U01_UML类图.puml",
+      "image": "UML/U01_UML类图.png",
+      "source_sha256": "e765357b70f6488a82f0b9eb6f9236bb7f427c97ef7c95e077b7d667f7cf4c3f",
+      "image_sha256": "e4be032fd1f65c538ac0eaf3c092dbb4013941336a222e617785712928f25e59",
+      "width_px": 1556,
+      "height_px": 1277
+    },
+    {
+      "source": "UML/U02_UML组件图.puml",
+      "image": "UML/U02_UML组件图.png",
+      "source_sha256": "ad430e34608432d228cd45a924287536222842f70352cf8f35493440e8e0d028",
+      "image_sha256": "35677511e3d5e3e4670d22d44acf3ef0cef85e5b322f5ed8c0d2e67d28272b25",
+      "width_px": 1321,
+      "height_px": 959
+    },
+    {
+      "source": "UML/U03_UML用例图.puml",
+      "image": "UML/U03_UML用例图.png",
+      "source_sha256": "d27b268947c7e3aa84f267e34f7a9213a4a37fef577b9365eb070d72115ca975",
+      "image_sha256": "c4d2966896597241105482f2a0d1b5c814836864c38e1552b7043d60d4e75a82",
+      "width_px": 566,
+      "height_px": 1266
+    },
+    {
+      "source": "UML/U04_UML活动图_交易流程.puml",
+      "image": "UML/U04_UML活动图_交易流程.png",
+      "source_sha256": "20c2cb5af3deb6dc3f26915b4ccc447c2e0e1951bb924e20512d7b7255a23bce",
+      "image_sha256": "433ba81f44a62f7f3b178a2e2f6a806567a835b5d9c6f2cad864dbc30a5bc05f",
+      "width_px": 1762,
+      "height_px": 1454
+    },
+    {
+      "source": "UML/U05_UML状态图_商品.puml",
+      "image": "UML/U05_UML状态图_商品.png",
+      "source_sha256": "e3b016f0b7fb9d3857676026a12d0bbd651db993dc65e90982190af5190c83e1",
+      "image_sha256": "8dc4c1bbd84011a7bb5f145cfb6bd3a01cfa23ee2313f1e7981eacd3eaa1e3d7",
+      "width_px": 1031,
+      "height_px": 784
+    },
+    {
+      "source": "UML/U06_UML状态图_预约.puml",
+      "image": "UML/U06_UML状态图_预约.png",
+      "source_sha256": "6ebcc93fa165d8241298db0faac4867da5426cb943c3a4805d7c775b05f8cba4",
+      "image_sha256": "c8c7c5e08af8f392af230e35e41a32aed87b79cc38eced348e8fe4a9f2c91314",
+      "width_px": 1040,
+      "height_px": 568
+    },
+    {
+      "source": "UML/U07_UML序列图_并发预约.puml",
+      "image": "UML/U07_UML序列图_并发预约.png",
+      "source_sha256": "565ca6c823d54793ffd861e248b0834aadf37f13fd9ed2e663f480131999eccc",
+      "image_sha256": "39cc857438ae8bf807d113061ccf3ffc5192b016e85dcd87ef0507e5169a869f",
+      "width_px": 740,
+      "height_px": 840
+    },
+    {
+      "source": "UML/U08_UML序列图_双方确认.puml",
+      "image": "UML/U08_UML序列图_双方确认.png",
+      "source_sha256": "93cb3d226e09c741f0ce637ae263ba2e7ca70f0b91bb6de61e5d0ba5fe8fa759",
+      "image_sha256": "ba3d2b45c6f3141dcf57d26ca1bb74665f8efba01f2368f875a42f2e8ebce5ec",
+      "width_px": 658,
+      "height_px": 905
+    },
+    {
+      "source": "UML/U09_UML序列图_下架与超时.puml",
+      "image": "UML/U09_UML序列图_下架与超时.png",
+      "source_sha256": "07ed31aeaa3ee372080b603a084552096e4c81e8a6bd901e06b847ced907827e",
+      "image_sha256": "96e8c2fa2018712aaba8cba3f1e9028522d2ad1ae38498a41c82cf914d753e13",
+      "width_px": 780,
+      "height_px": 856
+    }
+  ]
+}

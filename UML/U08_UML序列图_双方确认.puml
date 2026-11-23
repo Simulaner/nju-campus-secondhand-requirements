@@ -1,0 +1,53 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 双方确认与唯一成交
+actor "买家 / 卖家" as User
+boundary "预约详情" as UI
+control "confirm_handover" as Service
+database "SQLite" as DB
+User -> UI : 确认收货或确认交易完成
+UI -> Service : 预约 ID 和当前账号
+Service -> DB : BEGIN IMMEDIATE
+Service -> DB : 查询当事人的最新预约和商品
+alt 已完成重试，或本方已经确认
+  Service -> DB : 读取已有状态
+  Service --> UI : 显示已有结果
+else 最先确认的一方
+  Service -> DB : 保存本方确认时间及通知
+  Service -> DB : COMMIT
+  Service --> UI : 等待另一方
+else 最后确认的一方
+  Service -> DB : 预约已完成，商品已售出
+  Service -> DB : 写唯一成交、通知、审计\n清理联系方式
+  Service -> DB : COMMIT
+  Service --> UI : 显示成交
+else 预约不可处理或写入失败
+  Service -> DB : ROLLBACK
+  Service -> DB : 事务外写失败审计
+  Service --> UI : 显示错误
+end
+note over Service, DB
+  待交接预约方可接受新确认
+  成交价取预约时的金额快照
+end note
+
+@enduml

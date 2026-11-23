@@ -1,0 +1,71 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 使用角色与权限
+left to right direction
+actor 访客 as Visitor
+actor 买家 as Buyer
+actor 卖家 as Seller
+actor 管理员 as Admin
+actor "到期扫描" as Clock
+rectangle "栖物校园二手交易平台" {
+  usecase "校园邮箱验证码注册与登录" as Login
+  usecase "组合搜索、排序和查看公开商品" as Search
+  usecase "预约商品" as Reserve
+  usecase "取消本人预约" as Cancel
+  usecase "确认收货" as Receive
+  usecase "查询个人记录和阅读通知" as History
+  usecase "保存草稿、修改和送审" as Edit
+  usecase "主动下架和重新送审" as Offline
+  usecase "接受或拒绝预约" as Accept
+  usecase "确认交易完成" as Finish
+  usecase "分享、撤回或查看授权联系方式" as Contact
+  usecase "审核商品并记录结果" as Review
+  usecase "违规下架和解除重审限制" as Moderate
+  usecase "停用或恢复普通账号" as Account
+  usecase "查看统计和只读审计" as Statistics
+  usecase "处理到期的待确认预约" as Timeout
+}
+Visitor --> Login
+Visitor --> Search
+Buyer --> Search
+Buyer --> Reserve
+Buyer --> Cancel
+Buyer --> Receive
+Buyer --> History
+Buyer --> Contact
+Seller --> Edit
+Seller --> Offline
+Seller --> Accept
+Seller --> Finish
+Seller --> History
+Seller --> Contact
+Admin --> Review
+Admin --> Moderate
+Admin --> Account
+Admin --> Statistics
+Clock --> Timeout
+note bottom of Seller
+  普通账号可以担任买家和卖家
+  交易操作按当前预约中的身份授权
+end note
+
+@enduml

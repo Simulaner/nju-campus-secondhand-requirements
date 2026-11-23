@@ -1,0 +1,118 @@
+Fresh checkout before setup: no .venv and no db.sqlite3
+$ make setup PYTHON=<python3.12>
+"<python3.12>" -m venv .venv
+.venv/bin/python -m pip --disable-pip-version-check install -r requirements.txt
+Collecting asgiref==3.13.0 (from -r requirements.txt (line 1))
+  Using cached asgiref-3.13.0-py3-none-any.whl.metadata (12 kB)
+Collecting Django==5.2.19 (from -r requirements.txt (line 2))
+  Using cached django-5.2.19-py3-none-any.whl.metadata (4.1 kB)
+Collecting pillow==12.3.0 (from -r requirements.txt (line 3))
+  Using cached pillow-12.3.0-cp312-cp312-macosx_11_0_arm64.whl.metadata (9.1 kB)
+Collecting sqlparse==0.6.1 (from -r requirements.txt (line 4))
+  Using cached sqlparse-0.6.1-py3-none-any.whl.metadata (6.9 kB)
+Using cached asgiref-3.13.0-py3-none-any.whl (27 kB)
+Using cached django-5.2.19-py3-none-any.whl (8.3 MB)
+Using cached pillow-12.3.0-cp312-cp312-macosx_11_0_arm64.whl (4.8 MB)
+Using cached sqlparse-0.6.1-py3-none-any.whl (51 kB)
+Installing collected packages: sqlparse, pillow, asgiref, Django
+Successfully installed Django-5.2.19 asgiref-3.13.0 pillow-12.3.0 sqlparse-0.6.1
+Exit code 0
+
+$ make build
+.venv/bin/python -m compileall -q manage.py qiwu
+.venv/bin/python manage.py check
+System check identified no issues (0 silenced).
+Exit code 0
+
+$ make migrate
+.venv/bin/python manage.py migrate --noinput
+Operations to perform:
+  Apply all migrations: accounts, auth, contenttypes, market, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying accounts.0001_initial... OK
+  Applying market.0001_initial... OK
+  Applying market.0002_product_image_content... OK
+  Applying market.0003_default_categories... OK
+  Applying market.0004_moderation_record... OK
+  Applying sessions.0001_initial... OK
+Exit code 0
+
+$ make test
+.venv/bin/python manage.py test
+Creating test database for alias 'default'...
+...............................................................................
+----------------------------------------------------------------------
+Ran 79 tests in 4.611s
+
+OK
+Destroying test database for alias 'default'...
+Found 79 test(s).
+System check identified no issues (0 silenced).
+Exit code 0
+
+$ .venv/bin/python -m pip check
+No broken requirements found.
+Exit code 0
+
+$ .venv/bin/python manage.py showmigrations
+accounts
+ [X] 0001_initial
+auth
+ [X] 0001_initial
+ [X] 0002_alter_permission_name_max_length
+ [X] 0003_alter_user_email_max_length
+ [X] 0004_alter_user_username_opts
+ [X] 0005_alter_user_last_login_null
+ [X] 0006_require_contenttypes_0002
+ [X] 0007_alter_validators_add_error_messages
+ [X] 0008_alter_user_username_max_length
+ [X] 0009_alter_user_last_name_max_length
+ [X] 0010_alter_group_name_max_length
+ [X] 0011_update_proxy_permissions
+ [X] 0012_alter_user_first_name_max_length
+contenttypes
+ [X] 0001_initial
+ [X] 0002_remove_content_type_name
+market
+ [X] 0001_initial
+ [X] 0002_product_image_content
+ [X] 0003_default_categories
+ [X] 0004_moderation_record
+sessions
+ [X] 0001_initial
+Exit code 0
+
+$ .venv/bin/python qa/check_races.py
+PASS two buyers competing for one item
+PASS concurrent retries return one receipt and one reservation
+PASS price edit versus booking
+PASS seller acceptance and timeout before and after the deadline
+PASS unpublish versus expiry and replay of the expiry job
+PASS simultaneous confirmation creates one trade
+PASS second confirmation versus cancellation
+PASS account suspension versus new booking
+Exit code 0
+
+$ .venv/bin/python -m pip list --disable-pip-version-check
+Package  Version
+-------- -------
+asgiref  3.13.0
+Django   5.2.19
+pillow   12.3.0
+pip      25.0.1
+sqlparse 0.6.1
+Exit code 0

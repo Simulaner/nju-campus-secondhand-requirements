@@ -1,0 +1,68 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · Django 组件与存储
+top to bottom direction
+actor "访客 / 普通账号" as User
+actor 管理员 as Admin
+component "Django 页面与表单\nurls / views / templates" as UI
+component "账号与登录\nqiwu.accounts" as Auth
+package "qiwu.market" {
+  component "商品、查询和审核\nservices.py" as Products
+  component "预约和成交\nreservations.py" as Booking
+  component "违规与账号治理\ngovernance.py" as Governance
+  component "工作台统计与日志\nmanagement_views.py" as Workbench
+  component "站内通知和审计\nevents.py / notification_views.py" as Events
+}
+component "启动补扫与每 15 秒扫描\nserve_market / expire_reservations" as Scan
+component "Django 邮件后端\n本机文件收件箱 / SMTP" as Mail
+database "SQLite\n关系数据与图片 BLOB" as DB
+folder "本机失败审计备份\n.audit-backup.jsonl" as Backup
+
+User --> UI
+Admin --> UI
+UI --> Auth : 会话和角色
+UI --> Products
+UI --> Booking
+UI --> Governance
+UI --> Workbench
+UI --> Events
+Auth --> Mail : 注册验证码
+Auth --> DB
+Products --> DB
+Booking --> DB
+Governance --> DB
+Workbench --> DB
+Events --> DB
+Products --> Events
+Booking --> Events
+Governance --> Booking : 下架、取消有效预约
+Governance --> Events
+Scan --> Booking : 扫描待确认预约
+Scan --> Events : 恢复归档
+Events --> Backup : 数据库暂不可写时追加失败记录
+note bottom of DB
+  业务写入使用 SQLite IMMEDIATE 事务
+  成功通知和业务变更同事务
+  失败审计在回滚后另存
+end note
+
+@enduml

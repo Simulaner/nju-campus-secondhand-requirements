@@ -1,0 +1,69 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 从商品送审到成交
+|卖家|
+start
+:保存商品草稿;
+:补齐字段和图片并送审;
+|管理员|
+while (审核通过?) is (否)
+  :驳回并记录原因;
+  |卖家|
+  :根据原因修改并再次送审;
+  |管理员|
+endwhile (是)
+:通过审核并公开商品;
+|买家|
+:搜索商品并提交预约;
+|系统|
+if (权限、版本和商品状态均有效?) then (是)
+  :同事务建立有效预约及回执并占用商品;
+else (否)
+  :显示冲突或错误;
+  stop
+endif
+|卖家|
+if (24 小时内接受预约?) then (是)
+  :接受预约，等待线下面交;
+  |买卖双方|
+  :可授权分享或撤回面交联系方式;
+  :线下交接;
+  |系统|
+  :分别保存买家和卖家的确认时间;
+  while (双方确认均已保存?) is (否)
+    if (预约已取消或商品下架?) then (是)
+      :结束预约并清理联系方式;
+      :按商品实时状态处理占用;
+      stop
+    endif
+    :等待对方确认;
+  endwhile (是)
+  :同事务完成预约、写入唯一成交、标为已售出\n写通知和审计并清理联系方式;
+  stop
+else (拒绝、取消、到期或下架)
+  |系统|
+  :按实际事件终止预约并写入通知和审计;
+  :仅释放仍保持预约占用的商品;
+  stop
+endif
+
+@enduml

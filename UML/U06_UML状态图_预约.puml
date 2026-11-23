@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 预约生命周期
+hide empty description
+state "待卖家确认" as Pending
+state "已确认待交接" as Accepted
+state "已拒绝" as Rejected
+state "已取消" as Cancelled
+state "已超时" as Expired
+state "已完成" as Completed
+[*] --> Pending : 创建预约和回执
+Pending --> Accepted : 卖家接受 [now < expires_at]
+Pending --> Rejected : 卖家拒绝 [now < expires_at]
+Pending --> Expired : 定期扫描 [now >= expires_at]
+Pending --> Cancelled : 买家在期限内取消\n或下架、账号停用
+Accepted --> Cancelled : 买家取消、下架或账号停用
+Accepted --> Accepted : 一方确认，保存该方时间
+Accepted --> Completed : 双方均确认，写入唯一成交
+Rejected --> [*]
+Cancelled --> [*]
+Expired --> [*]
+Completed --> [*]
+note right of Accepted
+  24 小时期限只适用于待卖家确认
+  当事人可授权分享或撤回联系方式
+end note
+note bottom of Cancelled
+  终止操作同时清理面交联系方式
+  同一创建请求可返回原预约
+end note
+
+@enduml

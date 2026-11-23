@@ -1,0 +1,143 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 实现类图
+left to right direction
+class "账号\nUser" as User {
+  id: UUID
+  email: string {unique}
+  -password: string {hash}
+  display_name: string
+  is_staff: bool
+  is_active: bool
+  session_version: int
+}
+class "邮箱验证码\nEmailVerification" as Verification {
+  email: string {unique}
+  -code_hash: string
+  expires_at: datetime
+  attempts: int
+  consumed_at: datetime?
+}
+class "商品\nProduct" as Product {
+  id: UUID
+  title: string
+  price_fen: int?
+  condition: int?
+  meeting_place: string
+  status: ProductStatus
+  version: int
+  relist_blocked: bool
+  published_at: datetime?
+}
+class "分类\nCategory" as Category {
+  name: string {unique}
+  enabled: bool
+}
+class "图片元数据\nProductImage" as Image {
+  storage_key: string
+  position: int
+  mime_type: string
+}
+class "图片内容\nProductImageContent" as ImageContent {
+  data: bytes
+}
+class "预约\nReservation" as Reservation {
+  id: UUID
+  status: ReservationStatus
+  expires_at: datetime
+  buyer_confirmed_at: datetime?
+  seller_confirmed_at: datetime?
+  product_snapshot: JSON
+  version: int
+}
+class "成交记录\nTradeRecord" as Trade {
+  agreed_price_fen: int
+  completed_at: datetime
+}
+class "面交联系方式\nHandoverContact" as Contact {
+  kind: string
+  value: string
+  consent_at: datetime
+}
+class "请求回执\nRequestReceipt" as Receipt {
+  request_key: string
+  request_hash: string
+  object_id: UUID
+  result_code: string
+}
+class "商品审核\nReviewRecord" as Review {
+  product_version: int
+  decision: string
+  reason: string
+}
+class "治理记录\nModerationRecord" as Moderation {
+  action: string
+  reason: string
+  created_at: datetime
+}
+class "站内通知\nNotification" as Notice {
+  event_key: string
+  object_type: string
+  object_id: UUID
+  message: text
+  read_at: datetime?
+}
+class "操作审计\nAuditLog" as Audit {
+  object_type: string
+  object_id: UUID
+  action: string
+  result: string
+  reason_code: string
+  occurred_at: datetime
+}
+Verification ..> User : 注册时按邮箱匹配
+User "1" -- "0..*" Product : 卖家
+Category "0..1" -- "0..*" Product
+Product "1" *-- "0..9" Image
+Image "1" *-- "0..1" ImageContent
+Product "1" -- "0..*" Reservation
+User "1" -- "0..*" Reservation : 买家与卖家字段
+Reservation "1" -- "0..1" Trade
+Reservation "1" *-- "0..2" Contact
+User "1" -- "0..*" Contact : 授权人
+User "1" -- "0..*" Receipt : 发起人
+Receipt ..> Reservation : object_id
+Product "1" -- "0..*" Review
+User "1" -- "0..*" Review : 审核员
+User "1" -- "0..*" Moderation : 操作人
+User "0..1" -- "0..*" Moderation : 目标账号
+Product "0..1" -- "0..*" Moderation : 目标商品
+User "1" -- "0..*" Notice : 接收者
+User "0..1" -- "0..*" Audit : 操作者
+note bottom of Reservation
+  同件商品的待确认或已接受预约至多一条
+  卖家须与商品拥有者一致且与买家不同
+end note
+note bottom of Moderation
+  每条处理记录有一个商品或账号目标
+  违规下架和停用需要原因
+end note
+note bottom of Receipt
+  发起人与请求键联合唯一
+end note
+
+@enduml

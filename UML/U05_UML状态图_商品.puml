@@ -1,0 +1,53 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Noto Sans CJK SC"
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #63527B
+skinparam classBackgroundColor #F7F4FC
+skinparam classBorderColor #B3A3CB
+skinparam componentBackgroundColor #F7F4FC
+skinparam componentBorderColor #B3A3CB
+skinparam stateBackgroundColor #F7F4FC
+skinparam stateBorderColor #B3A3CB
+skinparam activityBackgroundColor #F7F4FC
+skinparam activityBorderColor #B3A3CB
+skinparam sequenceParticipantBackgroundColor #F7F4FC
+skinparam sequenceLifeLineBorderColor #C4BBCF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #D9C69A
+skinparam titleFontSize 22
+hide empty members
+title 栖物 · 商品生命周期
+hide empty description
+state "草稿" as Draft
+state "待审核" as Pending
+state "已驳回" as Rejected
+state "已发布" as Published
+state "已预约" as Reserved
+state "已售出" as Sold
+state "已下架" as Offline
+[*] --> Draft
+Draft --> Pending : 卖家提交 [字段和图片有效]
+Pending --> Rejected : 管理员驳回并记录原因
+Rejected --> Pending : 卖家修改后重新提交
+Pending --> Published : 管理员通过 [卖家账号可用]
+Published --> Pending : 修改公开信息后暂停公开
+Published --> Reserved : 建立唯一有效预约
+Reserved --> Published : 拒绝、取消或超时\n[商品仍处于预约状态]
+Published --> Offline : 主动下架、违规下架或账号停用
+Reserved --> Offline : 下架并取消有效预约
+Reserved --> Sold : 买卖双方均确认
+Offline --> Pending : 卖家重新提交\n[未限制重审且字段有效]
+Sold --> [*]
+note right of Offline
+  违规下架设置重审限制
+  解除限制和恢复账号后，商品须重新审核
+end note
+note bottom of Reserved
+  有效预约期间冻结商品编辑
+  改价与预约竞争时按事务中的实时状态决定
+end note
+
+@enduml

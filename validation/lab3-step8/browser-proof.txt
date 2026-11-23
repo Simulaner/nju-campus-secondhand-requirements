@@ -1,0 +1,8 @@
+Superuser created successfully.
+The normal make run entry point served the new checkout.
+Separate seller, buyer, and administrator browser sessions signed in.
+Student and staff-domain registrations used codes read from the local file mailbox.
+Three listings passed moderation, and keyword search returned the expected item.
+Accepted / one confirmation / both confirmed trade-row counts: 0, 0, 1
+Dashboard verified 3 products, 0 pending reviews, 0 active reservations, 1 completed trade.
+Saved four screenshots from the running clean checkout.
