@@ -6,6 +6,7 @@ from django.contrib.staticfiles.management.commands.runserver import (
 )
 from django.db import DatabaseError, connections
 
+from qiwu.market.events import archive_failed_audits
 from qiwu.market.reservations import expire_due_reservations
 
 SCAN_INTERVAL_SECONDS = 15
@@ -39,6 +40,9 @@ class Command(Runserver):
                 self.stdout.write(f"已处理 {expired} 笔到期预约。")
             if failed:
                 self.stderr.write(f"{failed} 笔到期预约将在下一轮重试。")
+            archived = archive_failed_audits()
+            if archived:
+                self.stdout.write(f"已归档 {archived} 条备用审计。")
         except DatabaseError:
             logger.exception("Expiry scan could not read the database")
         finally:

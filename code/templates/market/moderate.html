@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "moderation/base.html" %}
 {% block title %}审核 {{ product }}{% endblock %}
-{% block content %}
+{% block management_content %}
     <div class="page-heading">
         <h1>审核 {{ product }}</h1>
         <a href="{% url 'review_queue' %}">返回待审核队列</a>

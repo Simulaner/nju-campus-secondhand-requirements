@@ -3,6 +3,8 @@ from django.urls import path
 
 from .accounts import views as accounts
 from .accounts.forms import CampusLoginForm
+from .market import management_views as management
+from .market import notification_views as notices
 from .market import reservation_views as reservations
 from .market import views as market
 
@@ -24,6 +26,9 @@ urlpatterns = [
     ),
     path("accounts/logout/", LogoutView.as_view(), name="logout"),
     path("me/", market.my_records, name="my_records"),
+    path("me/notifications/", notices.inbox, name="notifications"),
+    path("me/notifications/read-all/", notices.read_all, name="read_all_notifications"),
+    path("me/notifications/<uuid:pk>/read/", notices.read_notice, name="read_notification"),
     path("me/products/<uuid:pk>/", market.my_product, name="my_product"),
     path("me/reservations/<uuid:pk>/", reservations.my_reservation, name="my_reservation"),
     path("me/reservations/<uuid:pk>/change/", reservations.change, name="change_reservation"),
@@ -32,4 +37,10 @@ urlpatterns = [
         "me/reservations/<uuid:pk>/contact/", reservations.handover_contact, name="handover_contact"
     ),
     path("moderation/reviews/", market.review_queue, name="review_queue"),
+    path("moderation/", management.dashboard, name="moderation_dashboard"),
+    path("moderation/products/", management.product_list, name="managed_products"),
+    path("moderation/products/<uuid:pk>/", management.product_detail, name="managed_product"),
+    path("moderation/accounts/", management.account_list, name="managed_accounts"),
+    path("moderation/accounts/<uuid:pk>/", management.account_detail, name="managed_account"),
+    path("moderation/audit/", management.audit_log, name="audit_log"),
 ]

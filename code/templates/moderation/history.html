@@ -1,0 +1,15 @@
+{% if decisions %}
+    <section class="record-panel">
+        <h2>处理记录</h2>
+        <ul class="review-history">
+            {% for decision in decisions %}
+                <li>
+                    <strong>{{ decision.get_action_display }}</strong>
+                    <span>· {{ decision.operator.display_name }}</span>
+                    <time datetime="{{ decision.created_at|date:'c' }}">{{ decision.created_at|date:"Y-m-d H:i" }}</time>
+                    {% if decision.reason %}<p class="product-description">{{ decision.reason }}</p>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}

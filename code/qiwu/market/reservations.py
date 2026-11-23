@@ -1,17 +1,16 @@
 import logging
-from contextlib import contextmanager
 from datetime import timedelta
 from hashlib import sha256
 
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import PermissionDenied
 from django.db import DatabaseError, transaction
 from django.db.models import F, Q
 from django.http import Http404
 from django.utils import timezone
 
+from .events import WorkflowConflict, audited_transaction, notify, record_action
 from .models import (
     ACTIVE_RESERVATION_STATUSES,
-    Notification,
     Product,
     ProductStatus,
     RequestReceipt,
@@ -19,7 +18,7 @@ from .models import (
     ReservationStatus,
     TradeRecord,
 )
-from .services import record_action, require_active_actor
+from .services import require_active_actor
 
 SELLER_WINDOW = timedelta(hours=24)
 RESERVATION_CREATED = "reservation_created"
@@ -32,36 +31,8 @@ RESERVATION_ACTIONS = {
 logger = logging.getLogger(__name__)
 
 
-class ReservationConflict(ValidationError):
+class ReservationConflict(WorkflowConflict):
     pass
-
-
-@contextmanager
-def _audited_mutation(actor, object_type, pk, action):
-    try:
-        with transaction.atomic():
-            yield
-    except (ReservationConflict, Http404, PermissionDenied, DatabaseError) as exc:
-        if isinstance(exc, ReservationConflict):
-            failure = exc.code
-        elif isinstance(exc, Http404):
-            failure = "not_found"
-        elif isinstance(exc, PermissionDenied):
-            failure = "not_allowed"
-        else:
-            failure = "write_failed"
-        try:
-            record_action(actor, object_type, pk, action, failure=failure)
-        except DatabaseError:
-            logger.exception(
-                "Reservation audit failed: actor=%s object_type=%s object=%s action=%s reason=%s",
-                getattr(actor, "pk", None),
-                object_type,
-                pk,
-                action,
-                failure,
-            )
-        raise
 
 
 def participant_reservations(user):
@@ -71,12 +42,12 @@ def participant_reservations(user):
 
 
 def _notify(reservation, recipient_id, description):
-    Notification.objects.create(
-        recipient_id=recipient_id,
-        event_key=f"reservation:{reservation.pk}:{reservation.version}",
-        object_type="reservation",
-        object_id=reservation.pk,
-        message=f"《{reservation.product_snapshot.get('title') or reservation.product}》{description}",
+    notify(
+        recipient_id,
+        "reservation",
+        reservation.pk,
+        f"reservation:{reservation.pk}:{reservation.version}",
+        f"《{reservation.product_snapshot.get('title') or reservation.product}》{description}",
     )
 
 
@@ -95,7 +66,7 @@ def _reservation_from_receipt(actor, product_id, receipt, digest):
 def reserve_product(*, actor, pk, request_key, version):
     key = str(request_key)
     digest = sha256(f"reserve:{pk}:{version}".encode("ascii")).hexdigest()
-    with _audited_mutation(actor, "product", pk, "reserve"):
+    with audited_transaction(actor, "product", pk, "reserve"):
         require_active_actor(actor, staff=False)
         receipt = RequestReceipt.objects.filter(actor=actor, request_key=key).first()
         if receipt is not None:
@@ -216,7 +187,7 @@ def _end_reservation(reservation, status, reason):
 def change_reservation(*, actor, pk, action, version):
     label, next_status = RESERVATION_ACTIONS[action]
     audit_action = f"reservation_{action}"
-    with _audited_mutation(actor, "reservation", pk, audit_action):
+    with audited_transaction(actor, "reservation", pk, audit_action):
         reservation = _get_participant_reservation(actor, pk)
         _check_transition(reservation, actor, action, version)
 
@@ -266,7 +237,7 @@ def save_handover_contact(*, actor, pk, details):
 
 
 def confirm_handover(*, actor, pk):
-    with _audited_mutation(actor, "reservation", pk, "reservation_confirm"):
+    with audited_transaction(actor, "reservation", pk, "reservation_confirm"):
         reservation = _get_participant_reservation(actor, pk)
         if (
             reservation.status == ReservationStatus.COMPLETED
@@ -308,7 +279,7 @@ def confirm_handover(*, actor, pk):
 
 
 def unpublish_product(*, actor, pk, publication):
-    with _audited_mutation(actor, "product", pk, "product_unpublish"):
+    with audited_transaction(actor, "product", pk, "product_unpublish"):
         require_active_actor(actor, staff=False)
         product = Product.objects.filter(pk=pk, seller=actor).first()
         if product is None:
@@ -320,18 +291,39 @@ def unpublish_product(*, actor, pk, publication):
         if product.status not in (ProductStatus.PUBLISHED, ProductStatus.RESERVED):
             raise ReservationConflict("商品当前不能下架。", code="product_not_public")
 
-        reason = "卖家主动下架。"
-        _set_product_status(product, ProductStatus.OFFLINE, off_reason=reason)
-        reservation = product.reservations.filter(status__in=ACTIVE_RESERVATION_STATUSES).first()
-        if reservation is not None:
-            _end_reservation(reservation, ReservationStatus.CANCELLED, reason)
-            _notify(reservation, reservation.buyer_id, "已下架，预约随之取消。")
-            record_action(actor, "reservation", reservation.pk, "reservation_cancel")
+        take_product_offline(product, actor=actor, reason="卖家主动下架。")
         record_action(actor, "product", pk, "product_unpublish")
 
 
+def take_product_offline(product, *, actor, reason, block_relist=False):
+    # Callers hold the write transaction and have verified the product state.
+    _set_product_status(
+        product,
+        ProductStatus.OFFLINE,
+        off_reason=reason,
+        relist_blocked=product.relist_blocked or block_relist,
+    )
+    reservation = product.reservations.filter(status__in=ACTIVE_RESERVATION_STATUSES).first()
+    if reservation is not None:
+        reservation_reason = "商品因违规下架。" if block_relist else reason
+        _end_reservation(reservation, ReservationStatus.CANCELLED, reservation_reason)
+        _notify(reservation, reservation.buyer_id, "已下架，预约随之取消。")
+        record_action(actor, "reservation", reservation.pk, "reservation_cancel")
+
+
+def cancel_for_suspension(reservation, *, actor, suspended_account):
+    _end_reservation(reservation, ReservationStatus.CANCELLED, "当事人账号已停用。")
+    if reservation.product.seller.is_active:
+        _release_reserved_product(reservation.product)
+    partner = (
+        reservation.seller_id if reservation.buyer_id == suspended_account else reservation.buyer_id
+    )
+    _notify(reservation, partner, "的预约因对方账号停用已取消。")
+    record_action(actor, "reservation", reservation.pk, "reservation_cancel")
+
+
 def expire_reservation(*, pk, now):
-    with _audited_mutation(None, "reservation", pk, "reservation_expire"):
+    with audited_transaction(None, "reservation", pk, "reservation_expire"):
         reservation = Reservation.objects.select_related("product").filter(pk=pk).first()
         if reservation is None or not reservation.pending_expired(now):
             return False

@@ -1,0 +1,25 @@
+{% extends "moderation/base.html" %}
+{% block title %}平台统计{% endblock %}
+{% block management_content %}
+    <h1>平台统计</h1>
+    <dl class="stat-grid">
+        <div class="stat-card"><dt>商品总数</dt><dd>{{ product_total }}</dd></div>
+        <div class="stat-card"><dt>待审核</dt><dd>{{ pending_total }}</dd></div>
+        <div class="stat-card"><dt>有效预约</dt><dd>{{ active_total }}</dd></div>
+        <div class="stat-card"><dt>完成交易</dt><dd>{{ trade_total }}</dd></div>
+    </dl>
+    <div class="form-grid">
+        <section class="record-panel">
+            <h2>按分类</h2>
+            <dl class="stat-breakdown">
+                {% for name, count in categories %}<div><dt>{{ name }}</dt><dd>{{ count }}</dd></div>{% endfor %}
+            </dl>
+        </section>
+        <section class="record-panel">
+            <h2>按状态</h2>
+            <dl class="stat-breakdown">
+                {% for name, count in states %}<div><dt>{{ name }}</dt><dd>{{ count }}</dd></div>{% endfor %}
+            </dl>
+        </section>
+    </div>
+{% endblock %}

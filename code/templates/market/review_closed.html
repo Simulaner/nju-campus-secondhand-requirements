@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "moderation/base.html" %}
 {% block title %}审核结果{% endblock %}
-{% block content %}
+{% block management_content %}
     <section class="form-panel">
         <h1>{{ notice|default:"商品审核状态已更新" }}</h1>
         <a href="{% url 'review_queue' %}">返回待审核队列</a>

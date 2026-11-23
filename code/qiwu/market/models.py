@@ -138,6 +138,57 @@ class ReviewRecord(Entity):
         ]
 
 
+class ModerationAction(models.TextChoices):
+    VIOLATION = "product_violation", "违规下架"
+    UNBLOCK = "product_unblock", "解除重审限制"
+    DISABLE = "account_disable", "停用账号"
+    RESTORE = "account_restore", "恢复账号"
+
+
+class ModerationRecord(Entity):
+    operator = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="moderation_actions"
+    )
+    product = models.ForeignKey(
+        Product, on_delete=models.PROTECT, null=True, blank=True, related_name="moderation_records"
+    )
+    account = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="moderation_records",
+    )
+    action = models.CharField(max_length=24, choices=ModerationAction)
+    reason = models.TextField(blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["-created_at", "-pk"]
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    Q(
+                        product__isnull=False,
+                        account__isnull=True,
+                        action__in=(ModerationAction.VIOLATION, ModerationAction.UNBLOCK),
+                    )
+                    | Q(
+                        product__isnull=True,
+                        account__isnull=False,
+                        action__in=(ModerationAction.DISABLE, ModerationAction.RESTORE),
+                    )
+                ),
+                name="moderation_subject_matches_action",
+            ),
+            models.CheckConstraint(
+                condition=~Q(action__in=(ModerationAction.VIOLATION, ModerationAction.DISABLE))
+                | ~Q(reason=""),
+                name="mandatory_moderation_reason",
+            ),
+        ]
+
+
 class ReservationStatus(models.TextChoices):
     PENDING = "pending", "待卖家确认"
     ACCEPTED = "accepted", "已确认待交接"

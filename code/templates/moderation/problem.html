@@ -1,0 +1,9 @@
+{% extends "moderation/base.html" %}
+{% block title %}处理结果{% endblock %}
+{% block management_content %}
+    <section class="record-panel">
+        <h1>处理结果</h1>
+        <p role="alert">{{ notice }}</p>
+        <a href="{{ request.path }}">查看最新状态</a>
+    </section>
+{% endblock %}

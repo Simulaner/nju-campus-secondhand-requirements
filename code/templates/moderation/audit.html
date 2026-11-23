@@ -1,0 +1,30 @@
+{% extends "moderation/base.html" %}
+{% block title %}操作日志{% endblock %}
+{% block management_content %}
+    <h1>操作日志</h1>
+    {% include "moderation/filter.html" %}
+    {% if page.object_list %}
+        <div class="record-panel table-wrap">
+            <table class="data-table">
+                <thead><tr><th scope="col">时间</th><th scope="col">操作者</th><th scope="col">操作</th><th scope="col">对象</th><th scope="col">结果</th></tr></thead>
+                <tbody>
+                    {% for entry in page %}
+                        <tr>
+                            <td><time datetime="{{ entry.occurred_at|date:'c' }}">{{ entry.occurred_at|date:"Y-m-d H:i:s" }}</time></td>
+                            <td>{{ entry.actor.display_name|default:"系统" }}</td>
+                            <td>{{ entry.action_label }}</td>
+                            <td>{{ entry.object_label }}<small class="audit-object">{{ entry.object_id }}</small></td>
+                            <td>
+                                <span class="tag{% if entry.result == 'failure' %} reserved{% endif %}">{{ entry.result_label }}</span>
+                                {% if entry.reason_code %}<small class="audit-object">{{ entry.reason_code }}</small>{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "market/pagination.html" %}
+    {% else %}
+        <p class="empty-state">没有符合条件的操作日志。</p>
+    {% endif %}
+{% endblock %}

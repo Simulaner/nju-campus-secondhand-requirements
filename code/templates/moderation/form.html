@@ -1,0 +1,11 @@
+<form method="post">
+    {% csrf_token %}
+    {{ form.version }}{{ form.action }}
+    {{ form.version.errors }}{{ form.action.errors }}
+    {{ form.non_field_errors }}
+    <div class="field">
+        {{ form.reason.as_field_group }}
+        {% if action == "product_violation" or action == "account_disable" %}<p class="helptext">此操作需要填写原因。</p>{% endif %}
+    </div>
+    <button class="primary compact" type="submit">{{ action.label }}</button>
+</form>

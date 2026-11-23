@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="management-layout">
+        <aside>
+            <nav class="management-nav" aria-label="管理工作台">
+                {% with current=request.resolver_match.url_name %}
+                    <a href="{% url 'moderation_dashboard' %}"{% if current == "moderation_dashboard" %} aria-current="page"{% endif %}>平台统计</a>
+                    <a href="{% url 'review_queue' %}"{% if current == "review_queue" or current == "moderate" %} aria-current="page"{% endif %}>商品审核</a>
+                    <a href="{% url 'managed_products' %}"{% if current == "managed_products" or current == "managed_product" %} aria-current="page"{% endif %}>商品管理</a>
+                    <a href="{% url 'managed_accounts' %}"{% if current == "managed_accounts" or current == "managed_account" %} aria-current="page"{% endif %}>用户管理</a>
+                    <a href="{% url 'audit_log' %}"{% if current == "audit_log" %} aria-current="page"{% endif %}>操作日志</a>
+                {% endwith %}
+            </nav>
+        </aside>
+        <div class="management-body">{% block management_content %}{% endblock %}</div>
+    </div>
+{% endblock %}

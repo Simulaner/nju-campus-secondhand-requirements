@@ -5,6 +5,7 @@
     <section class="record-panel">
         <h2>我的发布</h2>
         <form class="record-filter" method="get">
+            {% if reservation_scope %}<input type="hidden" name="reservations" value="{{ reservation_scope }}">{% endif %}
             <label for="product-status">商品状态</label>
             <select id="product-status" name="status">
                 <option value="">全部状态</option>
@@ -24,6 +25,11 @@
     </section>
     <section class="record-panel">
         <h2>我参与的预约</h2>
+        <nav class="section-tabs" aria-label="预约状态">
+            <a href="{% querystring reservations=None %}"{% if not reservation_scope %} aria-current="page"{% endif %}>全部</a>
+            <a href="{% querystring reservations='active' %}"{% if reservation_scope == "active" %} aria-current="page"{% endif %}>进行中</a>
+            <a href="{% querystring reservations='history' %}"{% if reservation_scope == "history" %} aria-current="page"{% endif %}>已结束</a>
+        </nav>
         <ul class="record-list">
             {% for reservation in reservations %}
                 <li>
@@ -35,4 +41,18 @@
             {% endfor %}
         </ul>
     </section>
+    <section class="record-panel">
+        <h2>我的成交</h2>
+        <ul class="record-list">
+            {% for trade in trades %}
+                <li>
+                    <a href="{% url 'my_reservation' trade.reservation_id %}">{{ trade.reservation.product_snapshot.title|default:trade.reservation.product }}</a>
+                    <span>{% if trade.reservation.buyer_id == user.pk %}买入{% else %}卖出{% endif %} · ¥{{ trade.agreed_price_yuan|floatformat:"2u" }} · {{ trade.completed_at|date:"Y-m-d H:i" }}</span>
+                </li>
+            {% empty %}
+                <li>暂无成交记录</li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% include "moderation/history.html" with decisions=account_decisions %}
 {% endblock %}

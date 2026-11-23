@@ -20,6 +20,8 @@ from .models import (
     Product,
     ProductImageContent,
     ProductStatus,
+    ReservationStatus,
+    TradeRecord,
 )
 from .reservations import (
     ReservationConflict,
@@ -78,11 +80,13 @@ def public_product(request, pk):
 @never_cache
 @require_GET
 def product_image(request, pk):
-    allowed = Q(image__product__status__in=PUBLIC_PRODUCT_STATUSES)
+    allowed = Q(
+        image__product__status__in=PUBLIC_PRODUCT_STATUSES, image__product__seller__is_active=True
+    )
     if request.user.is_authenticated:
         allowed |= Q(image__product__seller=request.user)
         if request.user.is_staff:
-            allowed |= Q(image__product__status=ProductStatus.PENDING)
+            allowed |= ~Q(image__product__status=ProductStatus.DRAFT)
     content = get_object_or_404(
         ProductImageContent.objects.select_related("image").filter(allowed), pk=pk
     )
@@ -97,6 +101,19 @@ def my_records(request):
     if status:
         products = products.filter(status=status)
     reservations = participant_reservations(request.user).order_by("-created_at")
+    scope = request.GET.get("reservations", "")
+    if scope == "active":
+        reservations = reservations.filter(status__in=ACTIVE_RESERVATION_STATUSES)
+    elif scope == "history":
+        reservations = reservations.exclude(status__in=ACTIVE_RESERVATION_STATUSES)
+    trades = (
+        TradeRecord.objects.filter(
+            Q(reservation__buyer=request.user) | Q(reservation__seller=request.user),
+            reservation__status=ReservationStatus.COMPLETED,
+        )
+        .select_related("reservation__product")
+        .order_by("-completed_at", "-pk")
+    )
     return render(
         request,
         "market/records.html",
@@ -105,6 +122,9 @@ def my_records(request):
             "reservations": reservations,
             "states": ProductStatus.choices,
             "status": status,
+            "reservation_scope": scope,
+            "trades": trades,
+            "account_decisions": request.user.moderation_records.select_related("operator"),
         },
     )
 
@@ -121,6 +141,7 @@ def my_product(request, pk):
         {
             "product": product,
             "reviews": product.reviews.order_by("-created_at"),
+            "decisions": product.moderation_records.select_related("operator"),
             "can_unpublish": not request.user.is_staff
             and product.status in PUBLIC_PRODUCT_STATUSES,
         },
@@ -271,9 +292,9 @@ def moderate(request, pk):
         return render(request, "market/moderate.html", {"product": product, "form": form})
     try:
         review_product(actor=request.user, pk=pk, **form.cleaned_data)
-    except ProductConflict:
-        record_product_action(request.user, pk, "review", failure="stale")
-        return render(request, "market/review_closed.html", status=409)
+    except ProductConflict as exc:
+        record_product_action(request.user, pk, "review", failure=exc.code or "stale")
+        return render(request, "market/review_closed.html", {"notice": exc.message}, status=409)
     except (Http404, PermissionDenied):
         record_product_action(request.user, pk, "review", failure="access_changed")
         raise

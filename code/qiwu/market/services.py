@@ -5,11 +5,10 @@ from django.db.models import Prefetch
 from django.http import Http404
 from django.utils import timezone
 
+from .events import WorkflowConflict, notify, record_action
 from .models import (
     PUBLIC_PRODUCT_STATUSES,
-    AuditLog,
     Category,
-    Notification,
     Product,
     ProductImage,
     ProductImageContent,
@@ -26,24 +25,13 @@ SORTS = {
 }
 
 
-class ProductConflict(ValidationError):
+class ProductConflict(WorkflowConflict):
     pass
 
 
 def _check_version(product, version):
     if product.version != version:
         raise ProductConflict("商品已更新，请重新打开商品查看最新状态。")
-
-
-def record_action(actor, object_type, pk, action, *, failure=""):
-    AuditLog.objects.create(
-        actor=actor,
-        object_type=object_type,
-        object_id=pk,
-        action=action,
-        result="failure" if failure else "success",
-        reason_code=failure,
-    )
 
 
 def record_product_action(actor, pk, action, *, failure=""):
@@ -138,12 +126,14 @@ def save_product(*, actor, pk, creating, action, values):
 def review_product(*, actor, pk, version, decision, reason):
     require_active_actor(actor, staff=True)
     try:
-        product = Product.objects.get(pk=pk)
+        product = Product.objects.select_related("seller").get(pk=pk)
     except Product.DoesNotExist as exc:
         raise Http404 from exc
     _check_version(product, version)
     if product.status != ProductStatus.PENDING:
         raise ProductConflict("此商品当前不在待审核队列中。")
+    if decision == ReviewDecision.APPROVED and not product.seller.is_active:
+        raise ProductConflict("卖家账号已停用，恢复后才能通过该商品。", code="seller_inactive")
     ReviewRecord.objects.create(
         product=product, product_version=version, reviewer=actor, decision=decision, reason=reason
     )
@@ -156,21 +146,15 @@ def review_product(*, actor, pk, version, decision, reason):
         message = f"《{product}》已驳回，请查看审核意见。"
     product.version += 1
     product.save(update_fields=["status", "published_at", "version"])
-    Notification.objects.create(
-        recipient_id=product.seller_id,
-        event_key=f"review:{product.pk}:{version}",
-        object_type="product",
-        object_id=product.pk,
-        message=message,
-    )
+    notify(product.seller_id, "product", product.pk, f"review:{product.pk}:{version}", message)
     record_product_action(actor, pk, f"review_{decision}")
     return product
 
 
 def public_products():
-    return Product.objects.filter(status__in=PUBLIC_PRODUCT_STATUSES).select_related(
-        "category", "seller"
-    )
+    return Product.objects.filter(
+        status__in=PUBLIC_PRODUCT_STATUSES, seller__is_active=True
+    ).select_related("category", "seller")
 
 
 def with_product_images(queryset):

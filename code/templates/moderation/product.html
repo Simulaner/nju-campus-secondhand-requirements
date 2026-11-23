@@ -1,0 +1,25 @@
+{% extends "moderation/base.html" %}
+{% block title %}{{ product }}{% endblock %}
+{% block management_content %}
+    <div class="page-heading"><h1>{{ product }}</h1><a href="{% url 'managed_products' %}">返回商品管理</a></div>
+    <section class="record-panel">
+        <div class="record-toolbar">
+            <p class="tag">{{ product.get_status_display }}</p>
+            {% if product.relist_blocked %}<span>限制重审</span>{% endif %}
+            {% if product.status == "pending" %}<a class="secondary" href="{% url 'moderate' product.pk %}">审核商品</a>{% endif %}
+        </div>
+        {% include "market/detail.html" with show_seller=True %}
+    </section>
+    {% if action %}
+        <section class="record-panel editor">
+            <h2>商品处理</h2>
+            {% if action == "product_violation" %}
+                <p class="intro">下架会取消有效预约，并限制卖家重新送审。</p>
+            {% else %}
+                <p class="intro">解除后，卖家可以修改商品并重新提交审核。</p>
+            {% endif %}
+            {% include "moderation/form.html" %}
+        </section>
+    {% endif %}
+    {% include "moderation/history.html" %}
+{% endblock %}

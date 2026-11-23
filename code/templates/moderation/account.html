@@ -1,0 +1,25 @@
+{% extends "moderation/base.html" %}
+{% block title %}{{ account.display_name }}{% endblock %}
+{% block management_content %}
+    <div class="page-heading"><h1>{{ account.display_name }}</h1><a href="{% url 'managed_accounts' %}">返回用户管理</a></div>
+    <section class="record-panel editor">
+        <div class="record-toolbar">
+            <span class="tag">{% if account.is_active %}正常{% else %}已停用{% endif %}</span>
+            <span>{{ account.email }}</span>
+        </div>
+        <div class="detail-info">
+            {% if account.is_active %}
+                <h2>停用影响</h2>
+                <dl>
+                    <dt>将下架的商品</dt><dd>{{ product_count }} 件</dd>
+                    <dt>将取消的预约</dt><dd>{{ reservation_count }} 笔</dd>
+                </dl>
+                <p class="intro">账号的登录会话会失效，已完成的交易保留。</p>
+            {% else %}
+                <p class="intro">恢复后可重新登录。重新公开商品须由卖家提交审核。</p>
+            {% endif %}
+        </div>
+        {% include "moderation/form.html" %}
+    </section>
+    {% include "moderation/history.html" %}
+{% endblock %}
