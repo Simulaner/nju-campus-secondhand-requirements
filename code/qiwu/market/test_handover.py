@@ -172,11 +172,13 @@ class HandoverWorkflowTests(TestCase):
         reservation = self.reserve(accept=True)
         self.assertEqual(self.share(self.buying, reservation, "测试联系方式甲").status_code, 302)
         self.assertEqual(self.confirm(self.buying, reservation).status_code, 302)
-        with patch.object(
-            Notification.objects, "create", side_effect=IntegrityError("test failure")
+        with (
+            patch.object(
+                Notification.objects, "create", side_effect=IntegrityError("test failure")
+            ),
+            self.assertLogs("qiwu.market.reservation_views", level="ERROR"),
         ):
-            with self.assertLogs("qiwu.market.reservation_views", level="ERROR"):
-                response = self.confirm(self.selling, reservation)
+            response = self.confirm(self.selling, reservation)
         self.assertEqual(response.status_code, 503)
         reservation.refresh_from_db()
         self.assertIsNotNone(reservation.buyer_confirmed_at)
@@ -292,11 +294,13 @@ class HandoverWorkflowTests(TestCase):
     def test_unpublish_rolls_back_if_the_buyer_notification_cannot_be_written(self):
         reservation = self.reserve(accept=True)
         self.assertEqual(self.share(self.selling, reservation, "测试联系值").status_code, 302)
-        with patch.object(
-            Notification.objects, "create", side_effect=IntegrityError("test failure")
+        with (
+            patch.object(
+                Notification.objects, "create", side_effect=IntegrityError("test failure")
+            ),
+            self.assertLogs("qiwu.market.views", level="ERROR"),
         ):
-            with self.assertLogs("qiwu.market.views", level="ERROR"):
-                response = self.offline(self.selling, reservation.product)
+            response = self.offline(self.selling, reservation.product)
         self.assertEqual(response.status_code, 503)
         reservation.refresh_from_db()
         self.assertEqual(reservation.status, ReservationStatus.ACCEPTED)
@@ -408,9 +412,11 @@ class HandoverWorkflowTests(TestCase):
 
         cutoff = max(stalled.expires_at, offline.expires_at)
         with patch("qiwu.market.reservations.timezone.now", return_value=cutoff):
-            with patch.object(service, "_notify", side_effect=notify):
-                with self.assertLogs("qiwu.market.reservations", level="ERROR"):
-                    self.assertEqual(service.expire_due_reservations(), (1, 1))
+            with (
+                patch.object(service, "_notify", side_effect=notify),
+                self.assertLogs("qiwu.market.reservations", level="ERROR"),
+            ):
+                self.assertEqual(service.expire_due_reservations(), (1, 1))
             stalled.refresh_from_db()
             self.assertEqual(stalled.status, ReservationStatus.PENDING)
             self.assertEqual(stalled.product.status, ProductStatus.RESERVED)

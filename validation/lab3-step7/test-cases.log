@@ -1,0 +1,115 @@
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Found 79 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: messages, staticfiles
+  Apply all migrations: accounts, auth, contenttypes, market, sessions
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying accounts.0001_initial... OK
+  Applying market.0001_initial... OK
+  Applying market.0002_product_image_content... OK
+  Applying market.0003_default_categories... OK
+  Applying market.0004_moderation_record... OK
+  Applying sessions.0001_initial...test_duplicate_registration_even_from_second_browser (qiwu.accounts.tests.RegistrationTests.test_duplicate_registration_even_from_second_browser) ... ok
+test_expiry_at_ten_minutes_and_just_before (qiwu.accounts.tests.RegistrationTests.test_expiry_at_ten_minutes_and_just_before) ... ok
+test_failed_account_insert_does_not_consume_code (qiwu.accounts.tests.RegistrationTests.test_failed_account_insert_does_not_consume_code) ... ok
+test_failed_email_delivery_allows_immediate_retry (qiwu.accounts.tests.RegistrationTests.test_failed_email_delivery_allows_immediate_retry) ... ok
+test_fifth_wrong_answer_invalidates_code (qiwu.accounts.tests.RegistrationTests.test_fifth_wrong_answer_invalidates_code) ... ok
+test_only_exact_campus_domain_may_request_code (qiwu.accounts.tests.RegistrationTests.test_only_exact_campus_domain_may_request_code) ... ok
+test_password_and_nickname_checked_before_consuming_code (qiwu.accounts.tests.RegistrationTests.test_password_and_nickname_checked_before_consuming_code) ... ok
+test_post_requests_require_csrf_token (qiwu.accounts.tests.RegistrationTests.test_post_requests_require_csrf_token) ... ok
+test_resend_boundary_and_replacement (qiwu.accounts.tests.RegistrationTests.test_resend_boundary_and_replacement) ... ok
+test_student_mailbox_can_register_and_login (qiwu.accounts.tests.RegistrationTests.test_student_mailbox_can_register_and_login) ... ok
+test_verification_is_bound_to_the_requested_address (qiwu.accounts.tests.RegistrationTests.test_verification_is_bound_to_the_requested_address) ... ok
+test_verified_registration_and_separate_login (qiwu.accounts.tests.RegistrationTests.test_verified_registration_and_separate_login) ... ok
+test_wrong_password_and_disabled_account (qiwu.accounts.tests.RegistrationTests.test_wrong_password_and_disabled_account) ... ok
+test_buyer_can_cancel_after_one_confirmation (qiwu.market.test_handover.HandoverWorkflowTests.test_buyer_can_cancel_after_one_confirmation) ... ok
+test_buyer_or_seller_can_confirm_first_and_retries_keep_one_trade (qiwu.market.test_handover.HandoverWorkflowTests.test_buyer_or_seller_can_confirm_first_and_retries_keep_one_trade) ... ok
+test_completion_rolls_back_if_a_notification_cannot_be_written (qiwu.market.test_handover.HandoverWorkflowTests.test_completion_rolls_back_if_a_notification_cannot_be_written) ... ok
+test_confirmation_requires_accepted_reservation_and_the_actual_parties (qiwu.market.test_handover.HandoverWorkflowTests.test_confirmation_requires_accepted_reservation_and_the_actual_parties) ... ok
+test_contacts_need_consent_and_are_visible_only_to_the_current_parties (qiwu.market.test_handover.HandoverWorkflowTests.test_contacts_need_consent_and_are_visible_only_to_the_current_parties) ... ok
+test_each_side_can_update_and_withdraw_only_its_own_contact (qiwu.market.test_handover.HandoverWorkflowTests.test_each_side_can_update_and_withdraw_only_its_own_contact) ... ok
+test_scan_at_deadline_is_idempotent_and_accepted_reservations_stay_active (qiwu.market.test_handover.HandoverWorkflowTests.test_scan_at_deadline_is_idempotent_and_accepted_reservations_stay_active) ... ok
+test_scan_leaves_offline_goods_offline_and_continues_after_an_item_fails (qiwu.market.test_handover.HandoverWorkflowTests.test_scan_leaves_offline_goods_offline_and_continues_after_an_item_fails) ... ok
+test_seller_can_unpublish_after_expiry_from_the_same_publication (qiwu.market.test_handover.HandoverWorkflowTests.test_seller_can_unpublish_after_expiry_from_the_same_publication) ... ok
+test_sold_goods_cannot_be_unpublished (qiwu.market.test_handover.HandoverWorkflowTests.test_sold_goods_cannot_be_unpublished) ... ok
+test_unpublish_cancels_the_active_reservation_and_old_scan_does_nothing (qiwu.market.test_handover.HandoverWorkflowTests.test_unpublish_cancels_the_active_reservation_and_old_scan_does_nothing) ... ok
+test_unpublish_removes_contacts_on_an_accepted_reservation (qiwu.market.test_handover.HandoverWorkflowTests.test_unpublish_removes_contacts_on_an_accepted_reservation) ... ok
+test_unpublish_rolls_back_if_the_buyer_notification_cannot_be_written (qiwu.market.test_handover.HandoverWorkflowTests.test_unpublish_rolls_back_if_the_buyer_notification_cannot_be_written) ... ok
+test_voluntary_unpublish_allows_resubmission_and_republication_rejects_old_form (qiwu.market.test_handover.HandoverWorkflowTests.test_voluntary_unpublish_allows_resubmission_and_republication_rejects_old_form) ... ok
+test_admin_pages_and_writes_require_staff_and_drafts_are_private (qiwu.market.test_management.ManagementTests.test_admin_pages_and_writes_require_staff_and_drafts_are_private) ... ok
+test_audit_page_is_read_only_and_filters_failure_without_private_details (qiwu.market.test_management.ManagementTests.test_audit_page_is_read_only_and_filters_failure_without_private_details) ... ok
+test_inbox_read_operations_are_scoped_and_check_the_target_again (qiwu.market.test_management.ManagementTests.test_inbox_read_operations_are_scoped_and_check_the_target_again) ... ok
+test_personal_trade_history_is_scoped_to_the_parties (qiwu.market.test_management.ManagementTests.test_personal_trade_history_is_scoped_to_the_parties) ... ok
+test_restore_keeps_legacy_suspended_listings_unpublished (qiwu.market.test_management.ManagementTests.test_restore_keeps_legacy_suspended_listings_unpublished) ... ok
+test_statistics_count_products_once_even_with_multiple_reservations (qiwu.market.test_management.ManagementTests.test_statistics_count_products_once_even_with_multiple_reservations) ... ok
+test_suspension_closes_both_roles_keeps_history_and_revokes_old_sessions (qiwu.market.test_management.ManagementTests.test_suspension_closes_both_roles_keeps_history_and_revokes_old_sessions) ... ok
+test_suspension_rolls_back_session_version_and_product_if_notice_fails (qiwu.market.test_management.ManagementTests.test_suspension_rolls_back_session_version_and_product_if_notice_fails) ... ok
+test_unavailable_database_falls_back_to_a_private_audit_file_and_archives_once (qiwu.market.test_management.ManagementTests.test_unavailable_database_falls_back_to_a_private_audit_file_and_archives_once) ... ok
+test_unblock_leaves_product_offline_until_a_fresh_review (qiwu.market.test_management.ManagementTests.test_unblock_leaves_product_offline_until_a_fresh_review) ... ok
+test_violation_cancels_reservation_and_preserves_staff_reason_for_seller (qiwu.market.test_management.ManagementTests.test_violation_cancels_reservation_and_preserves_staff_reason_for_seller) ... ok
+test_adding_removing_and_reordering_images_is_atomic (qiwu.market.test_products.ProductWorkflowTests.test_adding_removing_and_reordering_images_is_atomic) ... ok
+test_image_limits_and_supported_formats (qiwu.market.test_products.ProductWorkflowTests.test_image_limits_and_supported_formats) ... ok
+test_incomplete_draft_is_private_and_can_be_edited_in_another_session (qiwu.market.test_products.ProductWorkflowTests.test_incomplete_draft_is_private_and_can_be_edited_in_another_session) ... ok
+test_invalid_price_condition_and_image_contents_are_rejected (qiwu.market.test_products.ProductWorkflowTests.test_invalid_price_condition_and_image_contents_are_rejected) ... ok
+test_legacy_image_metadata_does_not_count_as_an_uploaded_file (qiwu.market.test_products.ProductWorkflowTests.test_legacy_image_metadata_does_not_count_as_an_uploaded_file) ... ok
+test_new_form_replay_cannot_create_duplicate_drafts (qiwu.market.test_products.ProductWorkflowTests.test_new_form_replay_cannot_create_duplicate_drafts) ... ok
+test_pending_product_and_its_images_are_private_until_approval (qiwu.market.test_products.ProductWorkflowTests.test_pending_product_and_its_images_are_private_until_approval) ... ok
+test_real_change_to_published_product_suspends_public_access (qiwu.market.test_products.ProductWorkflowTests.test_real_change_to_published_product_suspends_public_access) ... ok
+test_rejection_reason_and_fresh_review_version_after_resubmission (qiwu.market.test_products.ProductWorkflowTests.test_rejection_reason_and_fresh_review_version_after_resubmission) ... ok
+test_reserved_and_sold_products_cannot_be_edited (qiwu.market.test_products.ProductWorkflowTests.test_reserved_and_sold_products_cannot_be_edited) ... ok
+test_review_permissions_and_duplicate_requests_are_audited (qiwu.market.test_products.ProductWorkflowTests.test_review_permissions_and_duplicate_requests_are_audited) ... ok
+test_review_rolls_back_if_notification_fails_and_writes_a_failure_audit (qiwu.market.test_products.ProductWorkflowTests.test_review_rolls_back_if_notification_fails_and_writes_a_failure_audit) ... ok
+test_submission_rejects_missing_fields_and_image (qiwu.market.test_products.ProductWorkflowTests.test_submission_rejects_missing_fields_and_image) ... ok
+test_combined_filters_and_visibility (qiwu.market.test_products.PublicCatalogTests.test_combined_filters_and_visibility) ... ok
+test_four_sort_orders_and_filter_preserving_pagination (qiwu.market.test_products.PublicCatalogTests.test_four_sort_orders_and_filter_preserving_pagination) ... ok
+test_seller_state_filter_does_not_include_other_sellers (qiwu.market.test_products.PublicCatalogTests.test_seller_state_filter_does_not_include_other_sellers) ... ok
+test_bad_request_key_does_not_reserve (qiwu.market.test_reservations.ReservationWorkflowTests.test_bad_request_key_does_not_reserve) ... ok
+test_cancel_active_reservations_and_replay_keeps_the_original_uuid (qiwu.market.test_reservations.ReservationWorkflowTests.test_cancel_active_reservations_and_replay_keeps_the_original_uuid) ... ok
+test_cancel_offline_product_does_not_publish_it (qiwu.market.test_reservations.ReservationWorkflowTests.test_cancel_offline_product_does_not_publish_it) ... ok
+test_cancel_rolls_back_status_and_contact_deletion_on_notification_failure (qiwu.market.test_reservations.ReservationWorkflowTests.test_cancel_rolls_back_status_and_contact_deletion_on_notification_failure) ... ok
+test_completed_reservation_cannot_be_cancelled (qiwu.market.test_reservations.ReservationWorkflowTests.test_completed_reservation_cannot_be_cancelled) ... ok
+test_first_request_reserves_product_and_replay_returns_same_receipt (qiwu.market.test_reservations.ReservationWorkflowTests.test_first_request_reserves_product_and_replay_returns_same_receipt) ... ok
+test_old_product_pages_are_rejected_and_private_objects_stay_hidden (qiwu.market.test_reservations.ReservationWorkflowTests.test_old_product_pages_are_rejected_and_private_objects_stay_hidden) ... ok
+test_only_buyers_get_the_form_and_posts_require_csrf (qiwu.market.test_reservations.ReservationWorkflowTests.test_only_buyers_get_the_form_and_posts_require_csrf) ... ok
+test_receipt_rollback_and_retry_use_the_same_key (qiwu.market.test_reservations.ReservationWorkflowTests.test_receipt_rollback_and_retry_use_the_same_key) ... ok
+test_reject_releases_product_and_a_new_buyer_can_reserve (qiwu.market.test_reservations.ReservationWorkflowTests.test_reject_releases_product_and_a_new_buyer_can_reserve) ... ok
+test_request_key_binds_product_and_version_and_is_scoped_to_actor (qiwu.market.test_reservations.ReservationWorkflowTests.test_request_key_binds_product_and_version_and_is_scoped_to_actor) ... ok
+test_seller_can_accept_but_other_accounts_cannot_act (qiwu.market.test_reservations.ReservationWorkflowTests.test_seller_can_accept_but_other_accounts_cannot_act) ... ok
+test_seller_deadline_is_inclusive_and_only_limits_pending_seller_actions (qiwu.market.test_reservations.ReservationWorkflowTests.test_seller_deadline_is_inclusive_and_only_limits_pending_seller_actions) ... ok
+test_existing_session_loses_access_when_disabled (qiwu.market.tests.AccessTests.test_existing_session_loses_access_when_disabled) ... ok
+test_review_queue_requires_admin_and_only_lists_pending_items (qiwu.market.tests.AccessTests.test_review_queue_requires_admin_and_only_lists_pending_items) ... ok
+test_revoked_session_version_requires_a_new_login (qiwu.market.tests.AccessTests.test_revoked_session_version_requires_a_new_login) ... ok
+test_two_sessions_have_independent_object_access (qiwu.market.tests.AccessTests.test_two_sessions_have_independent_object_access) ... ok
+test_draft_may_be_incomplete_and_keeps_its_owner (qiwu.market.tests.MarketDataTests.test_draft_may_be_incomplete_and_keeps_its_owner) ... ok
+test_email_uniqueness_ignores_case (qiwu.market.tests.MarketDataTests.test_email_uniqueness_ignores_case) ... ok
+test_image_slot_and_price_constraints (qiwu.market.tests.MarketDataTests.test_image_slot_and_price_constraints) ... ok
+test_only_one_active_reservation_and_history_is_retained (qiwu.market.tests.MarketDataTests.test_only_one_active_reservation_and_history_is_retained) ... ok
+test_parties_must_be_distinct_and_trade_is_unique (qiwu.market.tests.MarketDataTests.test_parties_must_be_distinct_and_trade_is_unique) ... ok
+test_reservation_seller_matches_product_owner (qiwu.market.tests.MarketDataTests.test_reservation_seller_matches_product_owner) ... ok
+test_review_version_and_rejection_reason (qiwu.market.tests.MarketDataTests.test_review_version_and_rejection_reason) ... ok
+test_public_home_displays_the_marketplace (qiwu.tests.HomePageTests.test_public_home_displays_the_marketplace) ... ok
+
+----------------------------------------------------------------------
+Ran 79 tests in 3.996s
+
+OK
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+ OK
+System check identified no issues (0 silenced).

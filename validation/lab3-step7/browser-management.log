@@ -1,0 +1,3 @@
+Startup archived a previously failed audit without changing other records.
+Chrome verified hand-counted statistics (6 products, 1 pending, 3 active, 1 completed), violation/unblock/re-review, account suspension and recovery, notices, history, and read-only audit.
+Independent SQLite connections verified suspension/booking and violation/checkout consistency.

@@ -158,11 +158,13 @@ class RegistrationTests(TestCase):
     def test_failed_account_insert_does_not_consume_code(self):
         self.start()
         code = self.delivered_code()
-        with patch.object(User.objects, "create_user", side_effect=RuntimeError("write failed")):
-            with self.assertRaises(RuntimeError):
-                register_user(
-                    email=self.email, code=code, display_name="读书人", password=self.password
-                )
+        with (
+            patch.object(User.objects, "create_user", side_effect=RuntimeError("write failed")),
+            self.assertRaises(RuntimeError),
+        ):
+            register_user(
+                email=self.email, code=code, display_name="读书人", password=self.password
+            )
         self.assertIsNone(EmailVerification.objects.get().consumed_at)
         self.assertRedirects(self.finish(code), reverse("login"))
 

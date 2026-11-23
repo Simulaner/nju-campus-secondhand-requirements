@@ -1,0 +1,4 @@
+make run caught up on startup and left the accepted reservation unchanged.
+Three Chrome roles verified publish/review/booking, opt-in contact privacy, trade counts 0/0/1, duplicate confirmation, and seller unpublishing.
+The running server automatically expired a reservation whose deadline passed after startup.
+Independent SQLite connections validated both confirmations, confirmation/cancellation, and expiry/unpublish races.

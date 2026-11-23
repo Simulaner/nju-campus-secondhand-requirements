@@ -16,9 +16,12 @@ class ModerationForm(forms.Form):
 
     def clean(self):
         values = super().clean()
-        if values.get("action") in (ModerationAction.VIOLATION, ModerationAction.DISABLE):
-            if not values.get("reason") and "reason" not in self.errors:
-                self.add_error("reason", "请填写处理原因。")
+        if (
+            values.get("action") in (ModerationAction.VIOLATION, ModerationAction.DISABLE)
+            and not values.get("reason")
+            and "reason" not in self.errors
+        ):
+            self.add_error("reason", "请填写处理原因。")
         return values
 
 

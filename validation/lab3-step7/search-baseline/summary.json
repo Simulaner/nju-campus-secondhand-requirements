@@ -1,0 +1,109 @@
+{
+  "concurrency": 100,
+  "threshold_seconds": 2,
+  "target_percent": 95,
+  "socket_timeout_seconds": 8,
+  "environment": {
+    "os": "Darwin",
+    "os_version": "27.2.1",
+    "arch": "arm64",
+    "python": "3.12.14",
+    "django": "5.2.19",
+    "sqlite": "3.53.1",
+    "cpu": "Apple M6",
+    "logical_cpus": 12,
+    "memory_bytes": 25769803776
+  },
+  "source_sha256": "a0e5e5a68f88c7893f26b6ee7d3b36d861ec5d1533c95e69a04d0f59be60db38",
+  "fixture": {
+    "products": 2400,
+    "covers": 2400,
+    "active_reservations": 400,
+    "sellers": 4,
+    "categories": 4,
+    "statuses": {
+      "published": 1600,
+      "reserved": 400,
+      "draft": 100,
+      "pending": 100,
+      "rejected": 100,
+      "offline": 100
+    }
+  },
+  "warmup_requests": 4,
+  "scenarios": [
+    {
+      "name": "keyword_new",
+      "path": "/?q=%E7%9B%B8%E6%9C%BA&sort=newest",
+      "expected_total": 500,
+      "expected_cards": 24
+    },
+    {
+      "name": "combined",
+      "path": "/?q=%E6%95%99%E6%9D%90&category=00000000-0000-0000-0000-000000000002&min_price=25.00&max_price=220.00&condition=7&status=published&sort=price_up",
+      "expected_total": 39,
+      "expected_cards": 24
+    },
+    {
+      "name": "reserved_page_two",
+      "path": "/?q=%E5%8F%B0%E7%81%AF&status=reserved&sort=price_down&page=2",
+      "expected_total": 100,
+      "expected_cards": 24
+    },
+    {
+      "name": "all_oldest",
+      "path": "/?sort=oldest",
+      "expected_total": 2000,
+      "expected_cards": 24
+    }
+  ],
+  "waves": [
+    {
+      "wave": 1,
+      "requests": 100,
+      "http_200": 31,
+      "matched": 31,
+      "within_2s": 31,
+      "percent_within_2s": 31.0,
+      "median_ms": 3.357,
+      "p95_ms": 166.754,
+      "max_ms": 173.286,
+      "passes": false
+    },
+    {
+      "wave": 2,
+      "requests": 100,
+      "http_200": 23,
+      "matched": 23,
+      "within_2s": 23,
+      "percent_within_2s": 23.0,
+      "median_ms": 2.965,
+      "p95_ms": 135.314,
+      "max_ms": 142.95,
+      "passes": false
+    },
+    {
+      "wave": 3,
+      "requests": 100,
+      "http_200": 29,
+      "matched": 29,
+      "within_2s": 29,
+      "percent_within_2s": 29.0,
+      "median_ms": 3.001,
+      "p95_ms": 166.378,
+      "max_ms": 176.911,
+      "passes": false
+    }
+  ],
+  "all": {
+    "requests": 300,
+    "http_200": 83,
+    "matched": 83,
+    "within_2s": 83,
+    "percent_within_2s": 27.667,
+    "median_ms": 3.114,
+    "p95_ms": 163.657,
+    "max_ms": 176.911,
+    "passes": false
+  }
+}

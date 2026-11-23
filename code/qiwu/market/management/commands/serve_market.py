@@ -4,6 +4,7 @@ from threading import Event, Thread
 from django.contrib.staticfiles.management.commands.runserver import (
     Command as Runserver,
 )
+from django.core.servers.basehttp import WSGIServer
 from django.db import DatabaseError, connections
 
 from qiwu.market.events import archive_failed_audits
@@ -13,8 +14,14 @@ SCAN_INTERVAL_SECONDS = 15
 logger = logging.getLogger(__name__)
 
 
+class MarketplaceServer(WSGIServer):
+    # Queue a classroom search wave while the server accepts new connections.
+    request_queue_size = 128
+
+
 class Command(Runserver):
     help = "Start the local marketplace and scan for expired reservations."
+    server_cls = MarketplaceServer
 
     def inner_run(self, *args, **options):
         self.stop_expiry = Event()

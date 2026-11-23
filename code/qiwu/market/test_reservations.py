@@ -251,11 +251,13 @@ class ReservationWorkflowTests(TestCase):
 
     def test_receipt_rollback_and_retry_use_the_same_key(self):
         data = self.read_form()
-        with patch.object(
-            Notification.objects, "create", side_effect=IntegrityError("test write failure")
+        with (
+            patch.object(
+                Notification.objects, "create", side_effect=IntegrityError("test write failure")
+            ),
+            self.assertLogs("qiwu.market.reservation_views", level="ERROR"),
         ):
-            with self.assertLogs("qiwu.market.reservation_views", level="ERROR"):
-                response = self.buying.post(self.reserve_url, data)
+            response = self.buying.post(self.reserve_url, data)
         self.assertContains(response, "重试原请求", status_code=503)
         self.assertContains(response, str(data["request_key"]), status_code=503)
         self.product.refresh_from_db()
@@ -276,11 +278,13 @@ class ReservationWorkflowTests(TestCase):
         contact = HandoverContact.objects.create(
             reservation=reservation, owner=self.buyer, kind="demo", value="local test contact"
         )
-        with patch.object(
-            Notification.objects, "create", side_effect=IntegrityError("test write failure")
+        with (
+            patch.object(
+                Notification.objects, "create", side_effect=IntegrityError("test write failure")
+            ),
+            self.assertLogs("qiwu.market.reservation_views", level="ERROR"),
         ):
-            with self.assertLogs("qiwu.market.reservation_views", level="ERROR"):
-                response = self.change(self.buying, reservation, "cancel")
+            response = self.change(self.buying, reservation, "cancel")
         self.assertEqual(response.status_code, 503)
         reservation.refresh_from_db()
         self.assertEqual(reservation.status, ReservationStatus.ACCEPTED)

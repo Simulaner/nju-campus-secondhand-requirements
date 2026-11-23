@@ -326,11 +326,13 @@ class ManagementTests(TestCase):
     def test_suspension_rolls_back_session_version_and_product_if_notice_fails(self):
         product = self.listing("事务回滚样品")
         reservation = self.book(product, self.second)
-        with patch.object(
-            Notification.objects, "create", side_effect=IntegrityError("test failure")
+        with (
+            patch.object(
+                Notification.objects, "create", side_effect=IntegrityError("test failure")
+            ),
+            self.assertLogs("qiwu.market.management_views", level="ERROR"),
         ):
-            with self.assertLogs("qiwu.market.management_views", level="ERROR"):
-                response = self.account_action(self.first, ModerationAction.DISABLE, "失败处理")
+            response = self.account_action(self.first, ModerationAction.DISABLE, "失败处理")
         self.assertEqual(response.status_code, 503)
         self.first.refresh_from_db()
         reservation.refresh_from_db()

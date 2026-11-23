@@ -1,0 +1,13 @@
+.venv/bin/python -m compileall -q manage.py qiwu
+.venv/bin/python manage.py check
+System check identified no issues (0 silenced).
+.venv/bin/python manage.py test
+Creating test database for alias 'default'...
+...............................................................................
+----------------------------------------------------------------------
+Ran 79 tests in 3.932s
+
+OK
+Destroying test database for alias 'default'...
+Found 79 test(s).
+System check identified no issues (0 silenced).

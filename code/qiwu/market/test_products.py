@@ -179,20 +179,22 @@ class ProductWorkflowTests(TestCase):
         first, second, third = product.images.all()
         endpoint = reverse("edit_product", args=[product.pk])
         self.assertContains(self.selling.get(endpoint), "移除图片 2")
-        with patch.object(
-            ProductImageContent.objects, "create", side_effect=IntegrityError("disk write")
+        with (
+            patch.object(
+                ProductImageContent.objects, "create", side_effect=IntegrityError("disk write")
+            ),
+            self.assertRaises(IntegrityError),
         ):
-            with self.assertRaises(IntegrityError):
-                self.selling.post(
-                    endpoint,
-                    {
-                        "action": "save",
-                        "version": product.version,
-                        "title": "不可写入",
-                        "remove_images": [first.pk],
-                        "images": [upload()],
-                    },
-                )
+            self.selling.post(
+                endpoint,
+                {
+                    "action": "save",
+                    "version": product.version,
+                    "title": "不可写入",
+                    "remove_images": [first.pk],
+                    "images": [upload()],
+                },
+            )
         self.assertEqual(list(product.images.all()), [first, second, third])
         product.refresh_from_db()
         self.assertEqual(product.title, "")
@@ -326,14 +328,16 @@ class ProductWorkflowTests(TestCase):
 
     def test_review_rolls_back_if_notification_fails_and_writes_a_failure_audit(self):
         product = self.pending()
-        with patch.object(
-            Notification.objects, "create", side_effect=IntegrityError("write failed")
+        with (
+            patch.object(
+                Notification.objects, "create", side_effect=IntegrityError("write failed")
+            ),
+            self.assertLogs("qiwu.market.views", level="ERROR"),
         ):
-            with self.assertLogs("qiwu.market.views", level="ERROR"):
-                response = self.moderating.post(
-                    reverse("moderate", args=[product.pk]),
-                    {"decision": ReviewDecision.APPROVED, "version": product.version},
-                )
+            response = self.moderating.post(
+                reverse("moderate", args=[product.pk]),
+                {"decision": ReviewDecision.APPROVED, "version": product.version},
+            )
         self.assertContains(response, "审核未保存", status_code=503)
         product.refresh_from_db()
         self.assertEqual(product.status, ProductStatus.PENDING)

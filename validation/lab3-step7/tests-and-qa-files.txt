@@ -1,0 +1,10 @@
+code/qa/benchmark_search.py
+code/qa/check_races.py
+code/qa/local_app.py
+code/qiwu/accounts/tests.py
+code/qiwu/market/test_handover.py
+code/qiwu/market/test_management.py
+code/qiwu/market/test_products.py
+code/qiwu/market/test_reservations.py
+code/qiwu/market/tests.py
+code/qiwu/tests.py

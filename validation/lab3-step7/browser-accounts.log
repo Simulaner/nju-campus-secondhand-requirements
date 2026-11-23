@@ -1,0 +1,22 @@
+Fresh migrations and offline administrator provisioned.
+Not Found: /favicon.ico
+Forbidden (Permission denied): /moderation/reviews/
+Traceback (most recent call last):
+  File "<workspace>/lab3/work/code/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "<workspace>/lab3/work/code/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<workspace>/lab3/work/code/.venv/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<workspace>/lab3/work/code/.venv/lib/python3.12/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/qiwu-step7-verify-TatxonJP/accounts/code/qiwu/market/views.py", line 260, in review_queue
+    raise PermissionDenied
+django.core.exceptions.PermissionDenied
+Browser checks passed: two users, independent logins, admin queue, logout, desktop/mobile layout.
+Two independent SQLite connections: one send, one completed registration.
+SMTP protocol: loopback receiver accepted the registration message.

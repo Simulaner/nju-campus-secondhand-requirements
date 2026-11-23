@@ -1,0 +1,8 @@
+PASS two buyers competing for one item
+PASS concurrent retries return one receipt and one reservation
+PASS price edit versus booking
+PASS seller acceptance and timeout before and after the deadline
+PASS unpublish versus expiry and replay of the expiry job
+PASS simultaneous confirmation creates one trade
+PASS second confirmation versus cancellation
+PASS account suspension versus new booking
