@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods
 
-from .forms import ProductForm, ReserveForm, ReviewForm, SearchForm
+from .forms import ProductForm, ReserveForm, ReviewForm, SearchForm, UnpublishForm
 from .models import (
     ACTIVE_RESERVATION_STATUSES,
     PUBLIC_PRODUCT_STATUSES,
@@ -21,7 +21,11 @@ from .models import (
     ProductImageContent,
     ProductStatus,
 )
-from .reservations import participant_reservations
+from .reservations import (
+    ReservationConflict,
+    participant_reservations,
+    unpublish_product,
+)
 from .services import (
     ProductConflict,
     public_products,
@@ -114,8 +118,48 @@ def my_product(request, pk):
     return render(
         request,
         "market/product.html",
-        {"product": product, "reviews": product.reviews.order_by("-created_at")},
+        {
+            "product": product,
+            "reviews": product.reviews.order_by("-created_at"),
+            "can_unpublish": not request.user.is_staff
+            and product.status in PUBLIC_PRODUCT_STATUSES,
+        },
     )
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def unpublish(request, pk):
+    if request.user.is_staff:
+        raise PermissionDenied
+    product = get_object_or_404(Product, pk=pk, seller=request.user)
+    if request.method == "GET" and product.status not in PUBLIC_PRODUCT_STATUSES:
+        return redirect("my_product", pk=pk)
+    form = UnpublishForm(
+        request.POST if request.method == "POST" else None,
+        initial={"publication": product.published_at.isoformat() if product.published_at else ""},
+    )
+    if request.method == "POST" and form.is_valid():
+        try:
+            unpublish_product(actor=request.user, pk=pk, **form.cleaned_data)
+        except ReservationConflict as exc:
+            return render(
+                request,
+                "market/edit_closed.html",
+                {"product": product, "notice": exc.message},
+                status=409,
+            )
+        except DatabaseError:
+            logger.exception("Failed to unpublish product %s", pk)
+            return render(
+                request,
+                "market/edit_closed.html",
+                {"product": product, "notice": "暂时无法确认下架结果。"},
+                status=503,
+            )
+        messages.success(request, "商品已下架。")
+        return redirect("my_product", pk=pk)
+    return render(request, "market/unpublish.html", {"product": product, "form": form})
 
 
 @login_required

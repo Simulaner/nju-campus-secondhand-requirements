@@ -7,15 +7,25 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_GET, require_POST
 
-from .forms import ReservationActionForm, ReserveForm
-from .models import PUBLIC_PRODUCT_STATUSES, ProductStatus, ReservationStatus
+from .forms import HandoverContactForm, ReservationActionForm, ReserveForm
+from .models import (
+    PUBLIC_PRODUCT_STATUSES,
+    HandoverContact,
+    ProductStatus,
+    ReservationStatus,
+    TradeRecord,
+)
 from .reservations import (
     ReservationConflict,
     change_reservation,
+    confirm_handover,
+    handover_is_open,
     participant_reservations,
     reserve_product,
+    save_handover_contact,
 )
 
 logger = logging.getLogger(__name__)
@@ -67,6 +77,10 @@ def reserve(request, pk):
 @login_required
 @require_GET
 def my_reservation(request, pk):
+    return _render_reservation(request, pk)
+
+
+def _render_reservation(request, pk, *, contact_form=None, status=200):
     reservation = get_object_or_404(participant_reservations(request.user), pk=pk)
     buying = reservation.buyer_id == request.user.pk
     product = reservation.product
@@ -76,6 +90,28 @@ def my_reservation(request, pk):
         product_link = reverse("public_product", args=[product.pk])
     elif not buying:
         product_link = reverse("my_product", args=[product.pk])
+    handover = not request.user.is_staff and handover_is_open(reservation)
+    own_contact = other_contact = trade = None
+    own_confirmation = reservation.buyer_confirmed_at if buying else reservation.seller_confirmed_at
+    if handover:
+        contacts = HandoverContact.objects.filter(
+            reservation_id=pk,
+            reservation__status=ReservationStatus.ACCEPTED,
+            reservation__product__status=ProductStatus.RESERVED,
+            reservation__buyer__is_active=True,
+            reservation__seller__is_active=True,
+            owner_id__in=(reservation.buyer_id, reservation.seller_id),
+        )
+        for contact in contacts:
+            if contact.owner_id == request.user.pk:
+                own_contact = contact
+            else:
+                other_contact = contact
+        if contact_form is None:
+            initial = {"kind": own_contact.kind, "value": own_contact.value} if own_contact else {}
+            contact_form = HandoverContactForm(initial=initial)
+    elif reservation.status == ReservationStatus.COMPLETED:
+        trade = TradeRecord.objects.filter(reservation_id=pk).first()
     return render(
         request,
         "market/reservation.html",
@@ -85,6 +121,12 @@ def my_reservation(request, pk):
             "partner": reservation.seller if buying else reservation.buyer,
             "product_link": product_link,
             "expired": expired,
+            "handover": handover,
+            "own_confirmation": own_confirmation,
+            "contact_form": contact_form,
+            "own_contact": own_contact,
+            "other_contact": other_contact,
+            "trade": trade,
             "show_seller_actions": (
                 not buying
                 and not request.user.is_staff
@@ -96,9 +138,11 @@ def my_reservation(request, pk):
                 buying
                 and not request.user.is_staff
                 and reservation.is_active
+                and not expired
                 and product.status in (ProductStatus.RESERVED, ProductStatus.OFFLINE)
             ),
         },
+        status=status,
     )
 
 
@@ -125,4 +169,46 @@ def change(request, pk):
             "查看预约最新状态",
         )
     messages.success(request, f"已{label}。")
+    return redirect("my_reservation", pk=pk)
+
+
+@login_required
+@require_POST
+def confirm(request, pk):
+    reservation_url = reverse("my_reservation", args=[pk])
+    try:
+        confirm_handover(actor=request.user, pk=pk)
+    except ReservationConflict as exc:
+        return _problem(request, exc.message, 409, reservation_url, "查看预约最新状态")
+    except DatabaseError:
+        logger.exception("Failed to confirm handover for reservation %s", pk)
+        return _problem(request, "暂时无法确认操作结果。", 503, reservation_url, "查看预约最新状态")
+    return redirect("my_reservation", pk=pk)
+
+
+@never_cache
+@sensitive_post_parameters("value")
+@login_required
+@require_POST
+def handover_contact(request, pk):
+    reservation_url = reverse("my_reservation", args=[pk])
+    action = request.POST.get("action")
+    details = None
+    if action == "share":
+        form = HandoverContactForm(request.POST)
+        if not form.is_valid():
+            return _render_reservation(request, pk, contact_form=form, status=400)
+        details = {name: form.cleaned_data[name] for name in ("kind", "value")}
+    elif action != "withdraw":
+        return _problem(request, "联系方式表单无效。", 400, reservation_url, "返回预约详情")
+    try:
+        save_handover_contact(actor=request.user, pk=pk, details=details)
+    except ReservationConflict as exc:
+        return _problem(request, exc.message, 409, reservation_url, "查看预约最新状态")
+    except DatabaseError as exc:
+        logger.error(
+            "Failed to save handover contact for reservation %s (%s)", pk, type(exc).__name__
+        )
+        return _problem(request, "暂时无法保存联系方式。", 503, reservation_url, "查看预约最新状态")
+    messages.success(request, "已分享联系方式。" if details else "已撤回联系方式。")
     return redirect("my_reservation", pk=pk)

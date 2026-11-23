@@ -6,7 +6,13 @@ from django import forms
 from django.core.exceptions import ValidationError
 from PIL import Image
 
-from .models import PUBLIC_PRODUCT_STATUSES, Category, ProductStatus, ReviewDecision
+from .models import (
+    CONTACT_KINDS,
+    PUBLIC_PRODUCT_STATUSES,
+    Category,
+    ProductStatus,
+    ReviewDecision,
+)
 from .reservations import RESERVATION_ACTIONS
 from .services import SORTS
 
@@ -163,3 +169,13 @@ class ReservationActionForm(forms.Form):
         choices=[(name, label) for name, (label, _) in RESERVATION_ACTIONS.items()]
     )
     version = forms.IntegerField(min_value=1, widget=forms.HiddenInput)
+
+
+class UnpublishForm(forms.Form):
+    publication = forms.DateTimeField(required=False, widget=forms.HiddenInput)
+
+
+class HandoverContactForm(forms.Form):
+    kind = forms.ChoiceField(label="联系方式类型", choices=CONTACT_KINDS)
+    value = forms.CharField(label="联系方式", max_length=160)
+    consent = forms.BooleanField(label="同意向本预约的另一方展示上面的联系方式", label_suffix="")

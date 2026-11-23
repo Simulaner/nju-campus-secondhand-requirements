@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}下架商品{% endblock %}
+{% block content %}
+    <section class="form-panel">
+        <h1>下架商品</h1>
+        <p>{{ product }}</p>
+        <p class="intro">下架后，商品会从大厅移除。有效预约会一起取消，买家会收到通知。</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.publication }}
+            {{ form.publication.errors }}
+            <div class="form-actions">
+                <button class="primary compact" type="submit">确认下架</button>
+                <a href="{% url 'my_product' product.pk %}">返回商品</a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

@@ -14,7 +14,7 @@
         <div class="detail-info">
             <dl>
                 <dt>{% if buying %}卖家{% else %}买家{% endif %}</dt><dd>{{ partner.display_name }}</dd>
-                {% if reservation.price_yuan is not None %}
+                {% if not trade and reservation.price_yuan is not None %}
                     <dt>预约时价格</dt><dd>¥{{ reservation.price_yuan|floatformat:"2u" }}</dd>
                 {% endif %}
                 <dt>校内面交地点</dt><dd>{{ reservation.product_snapshot.meeting_place|default:"待商定" }}</dd>
@@ -25,12 +25,28 @@
                     <dd><time datetime="{{ reservation.expires_at|date:'c' }}">{{ reservation.expires_at|date:"Y-m-d H:i" }}</time></dd>
                 {% endif %}
                 {% if reservation.cancel_reason %}<dt>结束原因</dt><dd>{{ reservation.cancel_reason }}</dd>{% endif %}
+                {% if handover or reservation.buyer_confirmed_at or reservation.seller_confirmed_at %}
+                    <dt>买家确认</dt>
+                    <dd>{{ reservation.buyer_confirmed_at|date:"Y-m-d H:i"|default:"待确认" }}</dd>
+                    <dt>卖家确认</dt>
+                    <dd>{{ reservation.seller_confirmed_at|date:"Y-m-d H:i"|default:"待确认" }}</dd>
+                {% endif %}
+                {% if trade %}
+                    <dt>成交价</dt><dd>¥{{ trade.agreed_price_yuan|floatformat:"2u" }}</dd>
+                    <dt>成交时间</dt><dd><time datetime="{{ trade.completed_at|date:'c' }}">{{ trade.completed_at|date:"Y-m-d H:i" }}</time></dd>
+                {% endif %}
             </dl>
         </div>
         {% if expired %}
             <p class="notice">卖家处理期限已过。</p>
-        {% elif reservation.status == "accepted" %}
-            <p class="notice">卖家已接受预约，等待双方线下面交。</p>
+        {% elif handover and own_confirmation %}
+            <p class="notice">已记录你的确认，等待对方确认。</p>
+        {% endif %}
+        {% if handover and not own_confirmation %}
+            <form class="form-actions" method="post" action="{% url 'confirm_handover' reservation.pk %}">
+                {% csrf_token %}
+                <button class="primary compact" type="submit">{% if buying %}确认收货{% else %}确认交易完成{% endif %}</button>
+            </form>
         {% endif %}
         {% if show_seller_actions or show_cancel %}
             <form class="form-actions" method="post" action="{% url 'change_reservation' reservation.pk %}">
@@ -45,4 +61,40 @@
             </form>
         {% endif %}
     </section>
+    {% if handover %}
+        <section class="record-panel editor">
+            <h2>面交联系方式</h2>
+            {% if other_contact %}
+                <div class="detail-info">
+                    <dl>
+                        <dt>对方的{{ other_contact.kind_label }}</dt><dd>{{ other_contact.value }}</dd>
+                    </dl>
+                </div>
+            {% else %}
+                <p class="intro">对方尚未分享联系方式。</p>
+            {% endif %}
+            <form method="post" action="{% url 'handover_contact' reservation.pk %}">
+                {% csrf_token %}
+                {{ contact_form.non_field_errors }}
+                <div class="form-grid">
+                    <div class="field">{{ contact_form.kind.as_field_group }}</div>
+                    <div class="field">{{ contact_form.value.as_field_group }}</div>
+                </div>
+                {{ contact_form.consent.errors }}
+                <div class="contact-consent">
+                    {{ contact_form.consent }}
+                    {{ contact_form.consent.label_tag }}
+                </div>
+                <div class="form-actions">
+                    <button class="secondary" type="submit" name="action" value="share">{% if own_contact %}更新联系方式{% else %}分享联系方式{% endif %}</button>
+                </div>
+            </form>
+            {% if own_contact %}
+                <form class="form-actions" method="post" action="{% url 'handover_contact' reservation.pk %}">
+                    {% csrf_token %}
+                    <button class="text-button" type="submit" name="action" value="withdraw">撤回联系方式</button>
+                </form>
+            {% endif %}
+        </section>
+    {% endif %}
 {% endblock %}

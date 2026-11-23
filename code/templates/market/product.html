@@ -11,7 +11,11 @@
             {% if product.editable %}
                 <a class="secondary" href="{% url 'edit_product' product.pk %}">{% if product.status == "draft" %}继续编辑{% else %}编辑商品{% endif %}</a>
             {% endif %}
+            {% if can_unpublish %}
+                <a class="secondary" href="{% url 'unpublish_product' product.pk %}">下架商品</a>
+            {% endif %}
         </div>
+        {% if product.status == "offline" and product.off_reason %}<p class="notice">{{ product.off_reason }}</p>{% endif %}
         {% include "market/detail.html" %}
     </section>
     {% if reviews %}

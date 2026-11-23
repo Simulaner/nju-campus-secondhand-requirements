@@ -124,6 +124,7 @@ def save_product(*, actor, pk, creating, action, values):
         setattr(product, name, value)
     if submitting:
         product.status = ProductStatus.PENDING
+        product.off_reason = ""
     if not creating:
         product.version += 1
     product.save()

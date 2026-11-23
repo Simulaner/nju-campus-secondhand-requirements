@@ -13,6 +13,7 @@ urlpatterns = [
     path("product-images/<uuid:pk>/", market.product_image, name="product_image"),
     path("sell/new/", market.edit_product, name="new_product"),
     path("sell/<uuid:pk>/edit/", market.edit_product, name="edit_product"),
+    path("sell/<uuid:pk>/unpublish/", market.unpublish, name="unpublish_product"),
     path("moderation/reviews/<uuid:pk>/", market.moderate, name="moderate"),
     path("accounts/register/", accounts.register, name="register"),
     path("accounts/register/verify/", accounts.verify_registration, name="verify_registration"),
@@ -26,5 +27,9 @@ urlpatterns = [
     path("me/products/<uuid:pk>/", market.my_product, name="my_product"),
     path("me/reservations/<uuid:pk>/", reservations.my_reservation, name="my_reservation"),
     path("me/reservations/<uuid:pk>/change/", reservations.change, name="change_reservation"),
+    path("me/reservations/<uuid:pk>/confirm/", reservations.confirm, name="confirm_handover"),
+    path(
+        "me/reservations/<uuid:pk>/contact/", reservations.handover_contact, name="handover_contact"
+    ),
     path("moderation/reviews/", market.review_queue, name="review_queue"),
 ]

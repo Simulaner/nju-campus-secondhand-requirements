@@ -384,6 +384,14 @@ nav a {
     margin-top: 1.25rem;
 }
 
+.contact-consent {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+    color: #534b61;
+}
+
 .form-grid .field {
     margin-block: 0.5rem;
 }

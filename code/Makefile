@@ -29,7 +29,7 @@ migrate: setup
 	$(VENV_PYTHON) manage.py migrate --noinput
 
 run: migrate
-	$(VENV_PYTHON) manage.py runserver 127.0.0.1:$(PORT)
+	$(VENV_PYTHON) manage.py serve_market 127.0.0.1:$(PORT)
 
 test: setup
 	$(VENV_PYTHON) manage.py test

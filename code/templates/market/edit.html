@@ -17,6 +17,8 @@
         {{ form.non_field_errors }}
         {% if product.status == "published" %}
             <p class="notice">保存改动后，商品将暂停公开并重新审核。</p>
+        {% elif product.status == "offline" %}
+            <p class="intro">可以修改并保存。再次公开前需要提交审核。</p>
         {% else %}
             <p class="intro">可以先保存草稿。送审时须填写基本信息并附上至少一张图片。</p>
         {% endif %}
@@ -47,7 +49,7 @@
             {% if product.status == "published" %}
                 <button class="primary compact" type="submit" name="action" value="save">保存修改</button>
             {% else %}
-                <button class="secondary" type="submit" name="action" value="save">{% if product.status == "rejected" %}保存修改{% else %}保存草稿{% endif %}</button>
+                <button class="secondary" type="submit" name="action" value="save">{% if product.status == "draft" %}保存草稿{% else %}保存修改{% endif %}</button>
                 <button class="primary compact" type="submit" name="action" value="submit">提交审核</button>
             {% endif %}
         </div>

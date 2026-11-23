@@ -76,7 +76,11 @@ class Product(Entity):
 
     @property
     def editable(self):
-        return self.status in (ProductStatus.DRAFT, ProductStatus.REJECTED, ProductStatus.PUBLISHED)
+        return self.status in (
+            ProductStatus.DRAFT,
+            ProductStatus.REJECTED,
+            ProductStatus.PUBLISHED,
+        ) or (self.status == ProductStatus.OFFLINE and not self.relist_blocked)
 
 
 class ProductImage(Entity):
@@ -200,6 +204,14 @@ class Reservation(Entity):
         return super().save(*args, **kwargs)
 
 
+CONTACT_KINDS = (
+    ("phone", "手机号"),
+    ("wechat", "微信号"),
+    ("email", "邮箱"),
+    ("other", "其他联系方式"),
+)
+
+
 class HandoverContact(Entity):
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="contacts")
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
@@ -211,6 +223,10 @@ class HandoverContact(Entity):
         constraints = [
             models.UniqueConstraint(fields=["reservation", "owner"], name="one_contact_per_party"),
         ]
+
+    @property
+    def kind_label(self):
+        return dict(CONTACT_KINDS).get(self.kind, "联系方式")
 
 
 class TradeRecord(Entity):
@@ -224,6 +240,10 @@ class TradeRecord(Entity):
                 condition=Q(agreed_price_fen__gt=0), name="trade_price_positive"
             ),
         ]
+
+    @property
+    def agreed_price_yuan(self):
+        return Decimal(self.agreed_price_fen).scaleb(-2)
 
 
 class RequestReceipt(Entity):
