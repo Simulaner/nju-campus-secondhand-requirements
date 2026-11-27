@@ -17,7 +17,7 @@
         <section class="record-panel">
             <ul class="notice-list">
                 {% for item in page %}
-                    <li class="notice-row">
+                    <li class="notice-row{% if not item.read_at %} unread{% endif %}">
                         <div>
                             <p>{% if not item.read_at %}<span class="tag">未读</span> {% endif %}{{ item.message }}</p>
                             <time datetime="{{ item.created_at|date:'c' }}">{{ item.created_at|date:"Y-m-d H:i" }}</time>

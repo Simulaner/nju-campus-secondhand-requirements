@@ -12,7 +12,7 @@
                 </div>
                 {% with photo=cover.images.all.0 %}
                     {% if photo %}<img class="feature-photo" src="{% url 'product_image' photo.pk %}" alt="">
-                    {% else %}<div class="feature-photo cover-placeholder">暂无图片</div>{% endif %}
+                    {% else %}<div class="feature-photo cover-placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>{% endif %}
                 {% endwith %}
             </a>
         </section>
@@ -72,7 +72,7 @@
                     <div class="card-photo">
                         {% with image=product.images.all.0 %}
                             {% if image %}<img class="product-cover" src="{% url 'product_image' image.pk %}" alt="" loading="lazy">
-                            {% else %}<div class="product-cover cover-placeholder">暂无图片</div>{% endif %}
+                            {% else %}<div class="product-cover cover-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>{% endif %}
                         {% endwith %}
                         {% if product.status == 'reserved' %}<span class="tag reserved">已预约</span>{% endif %}
                     </div>
